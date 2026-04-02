@@ -10,15 +10,15 @@ class SimpleGridWorld(gym.Env):
     - agent
     - goal
     - obstacles
-    - guaranteed reachable layouts
+    - guaranteed reachable layouts (optional)
     - BFS shortest path solver
     - orientation-aware agent for egocentric prompts
 
     Absolute actions:
-        0 = up/north
-        1 = right/east
-        2 = down/south
-        3 = left/west
+        0 = north
+        1 = east
+        2 = south
+        3 = west
     """
 
     metadata = {"render_modes": ["human"]}
@@ -73,6 +73,7 @@ class SimpleGridWorld(gym.Env):
         self.obstacles = None
         self.agent_facing = None
         self.current_step = 0
+        self.last_seed = None
 
     def _get_obs(self):
         return {
@@ -84,9 +85,14 @@ class SimpleGridWorld(gym.Env):
 
     def _get_info(self):
         manhattan_distance = int(np.abs(self.agent_pos - self.goal_pos).sum())
+        shortest_path = self.get_shortest_path()
+        shortest_path_length = None if shortest_path is None else len(shortest_path) - 1
+
         return {
             "manhattan_distance": manhattan_distance,
+            "shortest_path_length": shortest_path_length,
             "facing_name": self.facing_to_name[self.agent_facing],
+            "seed": self.last_seed,
         }
 
     def _in_bounds(self, pos):
@@ -172,32 +178,52 @@ class SimpleGridWorld(gym.Env):
     def get_valid_actions(self):
         return [action for action, _ in self._neighbors(self.agent_pos)]
 
-    def get_optimal_action(self):
+    def get_optimal_actions(self):
         """
-        Returns optimal absolute action:
-        0=north, 1=east, 2=south, 3=west
+        Returns a set of all optimal absolute first actions that lie on a
+        shortest valid path to the goal.
         """
         if np.array_equal(self.agent_pos, self.goal_pos):
+            return set()
+
+        shortest_path = self.get_shortest_path()
+        if shortest_path is None:
+            return set()
+
+        shortest_num_moves = len(shortest_path) - 1
+        optimal_actions = set()
+
+        for action, next_pos in self._neighbors(self.agent_pos):
+            continuation = self._bfs_path(next_pos, self.goal_pos)
+            if continuation is None:
+                continue
+
+            moves_after_first = len(continuation) - 1
+            total_moves_via_this_action = 1 + moves_after_first
+
+            if total_moves_via_this_action == shortest_num_moves:
+                optimal_actions.add(action)
+
+        return optimal_actions
+
+    def get_optimal_action(self):
+        """
+        Returns one optimal absolute action for convenience.
+        If multiple optimal actions exist, this returns the smallest action id.
+        """
+        optimal_actions = self.get_optimal_actions()
+        if not optimal_actions:
             return None
-
-        path = self.get_shortest_path()
-        if path is None or len(path) < 2:
-            return None
-
-        next_pos = path[1]
-        move = next_pos - self.agent_pos
-
-        for action, direction in self.action_to_direction.items():
-            if np.array_equal(move, direction):
-                return action
-
-        return None
+        return min(optimal_actions)
 
     def get_optimal_action_name(self):
         action = self.get_optimal_action()
         if action is None:
             return None
         return self.action_to_name[action]
+
+    def get_optimal_action_names(self):
+        return [self.action_to_name[action] for action in sorted(self.get_optimal_actions())]
 
     def absolute_to_relative_action(self, absolute_action):
         """
@@ -213,11 +239,15 @@ class SimpleGridWorld(gym.Env):
             return None
         return (absolute_action - self.agent_facing) % 4
 
+    def get_optimal_relative_actions(self):
+        absolute_actions = self.get_optimal_actions()
+        return {self.absolute_to_relative_action(action) for action in absolute_actions}
+
     def get_optimal_relative_action(self):
-        absolute_action = self.get_optimal_action()
-        if absolute_action is None:
+        relative_actions = self.get_optimal_relative_actions()
+        if not relative_actions:
             return None
-        return self.absolute_to_relative_action(absolute_action)
+        return min(relative_actions)
 
     def get_optimal_relative_action_name(self):
         relative_action = self.get_optimal_relative_action()
@@ -225,10 +255,54 @@ class SimpleGridWorld(gym.Env):
             return None
         return self.relative_action_to_name[relative_action]
 
+    def get_optimal_relative_action_names(self):
+        return [self.relative_action_to_name[action] for action in sorted(self.get_optimal_relative_actions())]
+
+    def get_state(self):
+        return {
+            "size": self.size,
+            "agent": self.agent_pos.copy(),
+            "goal": self.goal_pos.copy(),
+            "obstacles": self.obstacles.copy(),
+            "facing": int(self.agent_facing),
+            "seed": self.last_seed,
+        }
+
+    def set_state(self, agent, goal, obstacles, facing, seed=None):
+        self.agent_pos = np.array(agent, dtype=np.int32)
+        self.goal_pos = np.array(goal, dtype=np.int32)
+        self.obstacles = np.array(obstacles, dtype=np.int32)
+        self.agent_facing = int(facing)
+        self.current_step = 0
+        self.last_seed = seed
+
+        if self.obstacles.shape != (self.size, self.size):
+            raise ValueError("Obstacle grid shape does not match env size.")
+        if np.array_equal(self.agent_pos, self.goal_pos):
+            raise ValueError("Agent and goal cannot occupy the same cell.")
+        if self._is_obstacle(self.agent_pos):
+            raise ValueError("Agent cannot be placed on an obstacle.")
+        if self._is_obstacle(self.goal_pos):
+            raise ValueError("Goal cannot be placed on an obstacle.")
+        if self.ensure_path and not self.has_path():
+            raise ValueError("Provided state has no valid path from agent to goal.")
+
+        return self._get_obs(), self._get_info()
+
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-
+        self.last_seed = seed
         self.current_step = 0
+
+        if options is not None and "state" in options:
+            state = options["state"]
+            return self.set_state(
+                agent=state["agent"],
+                goal=state["goal"],
+                obstacles=state["obstacles"],
+                facing=state["facing"],
+                seed=state.get("seed", seed),
+            )
 
         while True:
             self._place_obstacles()
@@ -242,7 +316,6 @@ class SimpleGridWorld(gym.Env):
             if not self.ensure_path or self._bfs_path(self.agent_pos, self.goal_pos) is not None:
                 break
 
-        # Random initial facing: 0=N, 1=E, 2=S, 3=W
         self.agent_facing = int(self.np_random.integers(0, 4))
 
         observation = self._get_obs()
@@ -269,7 +342,7 @@ class SimpleGridWorld(gym.Env):
                 hit_obstacle = True
             else:
                 self.agent_pos = proposed_pos
-                self.agent_facing = action  # update facing only on successful move
+                self.agent_facing = action
 
         terminated = np.array_equal(self.agent_pos, self.goal_pos)
         truncated = self.current_step >= self.max_steps
@@ -306,6 +379,7 @@ class SimpleGridWorld(gym.Env):
         for row in grid:
             print(" ".join(row))
         print(f"Facing: {self.facing_to_name[self.agent_facing]}")
+        print(f"Seed: {self.last_seed}")
         print()
 
     def close(self):
