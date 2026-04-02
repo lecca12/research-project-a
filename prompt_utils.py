@@ -8,6 +8,15 @@ def obstacle_list_from_grid(obstacles):
     return coords
 
 
+def _coordinate_system_text(size):
+    last_index = size - 1
+    return (
+        "Coordinate system:\n"
+        f"- Row 0 is the top (north), row {last_index} is the bottom (south).\n"
+        f"- Column 0 is the left (west), column {last_index} is the right (east)."
+    )
+
+
 def make_allocentric_prompt(obs):
     """
     Allocentric prompt:
@@ -30,13 +39,15 @@ Agent position: ({agent_r},{agent_c})
 Goal position: ({goal_r},{goal_c})
 Obstacle cells: {obstacle_text}
 
+{_coordinate_system_text(obstacles.shape[0])}
+
 Choose exactly one action from:
 north, east, south, west
 
 Rules:
 - Do not move into an obstacle.
 - Do not move outside the grid.
-- Choose the best next move to get closer to the goal.
+- Choose the best next move that lies on a shortest valid path to the goal.
 
 Answer with one word only:
 north, east, south, or west
@@ -76,13 +87,21 @@ The goal is at ({goal_r},{goal_c})
 You are currently facing {facing_names[facing]}
 Obstacle cells: {obstacle_text}
 
+{_coordinate_system_text(obstacles.shape[0])}
+
+Relative actions are defined from your current facing direction:
+- forward = move straight ahead
+- right = turn/move to your right
+- backward = move behind you
+- left = turn/move to your left
+
 Choose exactly one action from:
 forward, right, backward, left
 
 Rules:
 - Do not move into an obstacle.
 - Do not move outside the grid.
-- Choose the best next move to get closer to the goal.
+- Choose the best next move that lies on a shortest valid path to the goal.
 
 Answer with one word only:
 forward, right, backward, or left
