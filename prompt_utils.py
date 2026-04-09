@@ -8,20 +8,7 @@ def obstacle_list_from_grid(obstacles):
     return coords
 
 
-def _coordinate_system_text(size):
-    last_index = size - 1
-    return (
-        "Coordinate system:\n"
-        f"- Row 0 is the top (north), row {last_index} is the bottom (south).\n"
-        f"- Column 0 is the left (west), column {last_index} is the right (east)."
-    )
-
-
-def make_allocentric_prompt(obs):
-    """
-    Allocentric prompt:
-    Uses absolute directions: north, east, south, west
-    """
+def _shared_grid_description(obs):
     agent_r, agent_c = obs["agent"]
     goal_r, goal_c = obs["goal"]
     obstacles = obs["obstacles"]
@@ -31,15 +18,37 @@ def make_allocentric_prompt(obs):
     if not obstacle_text:
         obstacle_text = "none"
 
+    coordinate_text = "\n".join(
+        [
+            "Coordinate system:",
+            "- Row 0 is the top (north), and row numbers increase downward (south).",
+            "- Column 0 is the left (west), and column numbers increase to the right (east).",
+        ]
+    )
+
+    return {
+        "grid_size": f"{obstacles.shape[0]} x {obstacles.shape[1]}",
+        "agent": (int(agent_r), int(agent_c)),
+        "goal": (int(goal_r), int(goal_c)),
+        "obstacles_text": obstacle_text,
+        "coordinate_text": coordinate_text,
+    }
+
+
+def make_allocentric_prompt(obs):
+    shared = _shared_grid_description(obs)
+    agent_r, agent_c = shared["agent"]
+    goal_r, goal_c = shared["goal"]
+
     prompt = f"""
 You are navigating a grid world.
 
-Grid size: {obstacles.shape[0]} x {obstacles.shape[1]}
+Grid size: {shared['grid_size']}
 Agent position: ({agent_r},{agent_c})
 Goal position: ({goal_r},{goal_c})
-Obstacle cells: {obstacle_text}
+Obstacle cells: {shared['obstacles_text']}
 
-{_coordinate_system_text(obstacles.shape[0])}
+{shared['coordinate_text']}
 
 Choose exactly one action from:
 north, east, south, west
@@ -47,7 +56,7 @@ north, east, south, west
 Rules:
 - Do not move into an obstacle.
 - Do not move outside the grid.
-- Choose the best next move that lies on a shortest valid path to the goal.
+- Choose the best next move that is part of a shortest valid path to the goal.
 
 Answer with one word only:
 north, east, south, or west
@@ -57,43 +66,29 @@ north, east, south, or west
 
 
 def make_egocentric_prompt(obs):
-    """
-    Egocentric prompt:
-    Uses relative directions: forward, right, backward, left
-    """
-    agent_r, agent_c = obs["agent"]
-    goal_r, goal_c = obs["goal"]
-    obstacles = obs["obstacles"]
+    shared = _shared_grid_description(obs)
+    agent_r, agent_c = shared["agent"]
+    goal_r, goal_c = shared["goal"]
     facing = obs["facing"]
 
-    facing_names = {
-        0: "north",
-        1: "east",
-        2: "south",
-        3: "west",
-    }
-
-    obstacle_coords = obstacle_list_from_grid(obstacles)
-    obstacle_text = ", ".join([f"({r},{c})" for r, c in obstacle_coords])
-    if not obstacle_text:
-        obstacle_text = "none"
+    facing_names = {0: "north", 1: "east", 2: "south", 3: "west"}
 
     prompt = f"""
 You are navigating a grid world.
 
-Grid size: {obstacles.shape[0]} x {obstacles.shape[1]}
+Grid size: {shared['grid_size']}
 Your current position is ({agent_r},{agent_c})
 The goal is at ({goal_r},{goal_c})
 You are currently facing {facing_names[facing]}
-Obstacle cells: {obstacle_text}
+Obstacle cells: {shared['obstacles_text']}
 
-{_coordinate_system_text(obstacles.shape[0])}
+{shared['coordinate_text']}
 
-Relative actions are defined from your current facing direction:
-- forward = move straight ahead
-- right = turn/move to your right
-- backward = move behind you
-- left = turn/move to your left
+Relative action meanings:
+- forward = keep moving in the direction you are currently facing
+- right = turn/move 90 degrees to your right
+- backward = move in the opposite direction
+- left = turn/move 90 degrees to your left
 
 Choose exactly one action from:
 forward, right, backward, left
@@ -101,7 +96,7 @@ forward, right, backward, left
 Rules:
 - Do not move into an obstacle.
 - Do not move outside the grid.
-- Choose the best next move that lies on a shortest valid path to the goal.
+- Choose the best next move that is part of a shortest valid path to the goal.
 
 Answer with one word only:
 forward, right, backward, or left
