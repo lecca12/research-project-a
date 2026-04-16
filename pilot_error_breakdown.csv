@@ -1,0 +1,8 @@
+mode,error_type,count,percent_of_steps
+allocentric,correct,139,0.17774936061381075
+allocentric,directional_or_detour_error,35,0.04475703324808184
+allocentric,obstacle_blindness,608,0.7774936061381074
+egocentric,boundary_error,629,0.3644264194669757
+egocentric,correct,267,0.15469293163383546
+egocentric,directional_or_detour_error,256,0.14831981460023175
+egocentric,obstacle_blindness,574,0.3325608342989571
