@@ -6,12 +6,11 @@ Usage:
     policy_fn = make_openai_policy_fn(model="gpt-4o-mini")
     answer = policy_fn(prompt)
 """
-import time
+
 import os
 from typing import Callable
 
 from openai import OpenAI
-
 
 
 DEFAULT_SYSTEM_INSTRUCTIONS = (
@@ -27,7 +26,6 @@ class OpenAIPolicyError(RuntimeError):
 
 def make_openai_policy_fn(
     model: str = "gpt-4o-mini",
-    temperature=0.0,
     api_key: str | None = None,
     system_instructions: str = DEFAULT_SYSTEM_INSTRUCTIONS,
     max_output_tokens: int = 16,
@@ -45,14 +43,10 @@ def make_openai_policy_fn(
 
     def policy_fn(prompt: str) -> str:
         try:
-            #to not overwhelm api and exceed rate limit
-            time.sleep(0.3)
-
             response = client.responses.create(
                 model=model,
                 instructions=system_instructions,
                 input=prompt,
-                temperature=temperature,
                 max_output_tokens=max_output_tokens,
             )
         except Exception as exc:
