@@ -1,0 +1,13 @@
+[workspace]
+authors = ["lecca <vnaerok@gmail.com>"]
+channels = ["conda-forge"]
+name = "research-project-a"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+numpy = ">=2.4.3,<3"
+gymnasium = ">=0.26.3,<0.27"
+openai = ">=2.32.0,<3"
