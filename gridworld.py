@@ -5,6 +5,22 @@ from collections import deque
 
 
 class SimpleGridWorld(gym.Env):
+    """
+    GridWorld with:
+    - agent
+    - goal
+    - obstacles
+    - guaranteed reachable layouts
+    - BFS shortest path solver
+    - orientation-aware agent for egocentric prompts
+
+    Absolute actions:
+        0 = north
+        1 = east
+        2 = south
+        3 = west
+    """
+
     metadata = {"render_modes": ["human"]}
 
     def __init__(self, size=5, obstacle_density=0.0, max_steps=50, ensure_path=True):
@@ -25,10 +41,10 @@ class SimpleGridWorld(gym.Env):
         })
 
         self.action_to_direction = {
-            0: np.array([-1, 0], dtype=np.int32),
-            1: np.array([0, 1], dtype=np.int32),
-            2: np.array([1, 0], dtype=np.int32),
-            3: np.array([0, -1], dtype=np.int32),
+            0: np.array([-1, 0], dtype=np.int32),  # north
+            1: np.array([0, 1], dtype=np.int32),   # east
+            2: np.array([1, 0], dtype=np.int32),   # south
+            3: np.array([0, -1], dtype=np.int32),  # west
         }
 
         self.action_to_name = {
@@ -43,13 +59,6 @@ class SimpleGridWorld(gym.Env):
             1: "east",
             2: "south",
             3: "west",
-        }
-
-        self.facing_to_symbol = {
-            0: "^",
-            1: ">",
-            2: "v",
-            3: "<",
         }
 
         self.relative_action_to_name = {
@@ -163,13 +172,10 @@ class SimpleGridWorld(gym.Env):
     def get_valid_actions(self):
         return [action for action, _ in self._neighbors(self.agent_pos)]
 
-    def get_optimal_action(self):
-        optimal_actions = self.get_optimal_actions()
-        if not optimal_actions:
-            return None
-        return sorted(optimal_actions)[0]
-
     def get_optimal_actions(self):
+        """
+        Returns a set of all optimal first absolute actions on a shortest valid path.
+        """
         if np.array_equal(self.agent_pos, self.goal_pos):
             return set()
 
@@ -184,11 +190,18 @@ class SimpleGridWorld(gym.Env):
             sub_path = self._bfs_path(next_pos, self.goal_pos)
             if sub_path is None:
                 continue
+
             sub_num_moves = len(sub_path) - 1
             if 1 + sub_num_moves == shortest_num_moves:
                 optimal_actions.add(action)
 
         return optimal_actions
+
+    def get_optimal_action(self):
+        optimal_actions = self.get_optimal_actions()
+        if not optimal_actions:
+            return None
+        return sorted(optimal_actions)[0]
 
     def get_optimal_action_name(self):
         action = self.get_optimal_action()
@@ -270,7 +283,7 @@ class SimpleGridWorld(gym.Env):
 
         return observation, reward, terminated, truncated, info
 
-    def render_text(self):
+    def render(self):
         grid = [["." for _ in range(self.size)] for _ in range(self.size)]
 
         for r in range(self.size):
@@ -281,21 +294,14 @@ class SimpleGridWorld(gym.Env):
         ar, ac = self.agent_pos
         gr, gc = self.goal_pos
 
-        if (ar, ac) == (gr, gc):
-            grid[gr][gc] = "*"
-        else:
-            grid[gr][gc] = "G"
-            grid[ar][ac] = self.facing_to_symbol[self.agent_facing]
+        grid[gr][gc] = "G"
+        grid[ar][ac] = "A"
 
-        lines = ["Grid:"]
+        print("\nGrid:")
         for row in grid:
-            lines.append(" ".join(row))
-        lines.append(f"Facing: {self.facing_to_name[self.agent_facing]} ({self.facing_to_symbol[self.agent_facing]})")
-        lines.append("Legend: X=obstacle, G=goal, ^=north, >=east, v=south, <=west, *=agent on goal")
-        return "\n".join(lines)
-
-    def render(self):
-        print("\n" + self.render_text() + "\n")
+            print(" ".join(row))
+        print(f"Facing: {self.facing_to_name[self.agent_facing]}")
+        print()
 
     def close(self):
         pass
