@@ -1,26 +1,12 @@
-import numpy as np
-import gymnasium as gym
-from gymnasium import spaces
+import copy
 from collections import deque
+
+import gymnasium as gym
+import numpy as np
+from gymnasium import spaces
 
 
 class SimpleGridWorld(gym.Env):
-    """
-    GridWorld with:
-    - agent
-    - goal
-    - obstacles
-    - guaranteed reachable layouts
-    - BFS shortest path solver
-    - orientation-aware agent for egocentric prompts
-
-    Absolute actions:
-        0 = north
-        1 = east
-        2 = south
-        3 = west
-    """
-
     metadata = {"render_modes": ["human"]}
 
     def __init__(self, size=5, obstacle_density=0.0, max_steps=50, ensure_path=True):
@@ -40,6 +26,7 @@ class SimpleGridWorld(gym.Env):
             "facing": spaces.Discrete(4),
         })
 
+        # Absolute actions
         self.action_to_direction = {
             0: np.array([-1, 0], dtype=np.int32),  # north
             1: np.array([0, 1], dtype=np.int32),   # east
@@ -54,6 +41,7 @@ class SimpleGridWorld(gym.Env):
             3: "west",
         }
 
+        # Facing
         self.facing_to_name = {
             0: "north",
             1: "east",
@@ -61,6 +49,14 @@ class SimpleGridWorld(gym.Env):
             3: "west",
         }
 
+        self.facing_to_symbol = {
+            0: "^",
+            1: ">",
+            2: "v",
+            3: "<",
+        }
+
+        # Relative actions
         self.relative_action_to_name = {
             0: "forward",
             1: "right",
@@ -73,6 +69,7 @@ class SimpleGridWorld(gym.Env):
         self.obstacles = None
         self.agent_facing = None
         self.current_step = 0
+        self.last_seed = None
 
     def _get_obs(self):
         return {
@@ -83,44 +80,22 @@ class SimpleGridWorld(gym.Env):
         }
 
     def _get_info(self):
-        manhattan_distance = int(np.abs(self.agent_pos - self.goal_pos).sum())
         return {
-            "manhattan_distance": manhattan_distance,
+            "manhattan_distance": int(np.abs(self.agent_pos - self.goal_pos).sum()),
             "facing_name": self.facing_to_name[self.agent_facing],
+            "seed": self.last_seed,
         }
 
     def _in_bounds(self, pos):
-        r, c = pos
+        r, c = int(pos[0]), int(pos[1])
         return 0 <= r < self.size and 0 <= c < self.size
 
     def _is_obstacle(self, pos):
-        r, c = pos
+        r, c = int(pos[0]), int(pos[1])
         return self.obstacles[r, c] == 1
 
     def _is_free(self, pos):
         return self._in_bounds(pos) and not self._is_obstacle(pos)
-
-    def _random_empty_cell(self):
-        while True:
-            pos = self.np_random.integers(0, self.size, size=2, dtype=np.int32)
-            if not self._is_obstacle(pos):
-                return pos
-
-    def _place_obstacles(self):
-        self.obstacles = np.zeros((self.size, self.size), dtype=np.int32)
-
-        total_cells = self.size * self.size
-        num_obstacles = int(total_cells * self.obstacle_density)
-
-        if num_obstacles == 0:
-            return
-
-        all_positions = [(r, c) for r in range(self.size) for c in range(self.size)]
-        chosen_indices = self.np_random.choice(len(all_positions), size=num_obstacles, replace=False)
-
-        for idx in chosen_indices:
-            r, c = all_positions[idx]
-            self.obstacles[r, c] = 1
 
     def _neighbors(self, pos):
         neighbors = []
@@ -157,133 +132,123 @@ class SimpleGridWorld(gym.Env):
         path = []
         current = goal_tuple
         while current is not None:
-            path.append(np.array(current, dtype=np.int32))
+            path.append(np.array(current))
             current = came_from[current]
 
         path.reverse()
         return path
 
-    def has_path(self):
-        return self._bfs_path(self.agent_pos, self.goal_pos) is not None
-
-    def get_shortest_path(self):
-        return self._bfs_path(self.agent_pos, self.goal_pos)
-
-    def get_valid_actions(self):
-        return [action for action, _ in self._neighbors(self.agent_pos)]
+    def _shortest_distance(self, start, goal):
+        path = self._bfs_path(start, goal)
+        if path is None:
+            return None
+        return len(path) - 1
 
     def get_optimal_actions(self):
-        """
-        Returns a set of all optimal first absolute actions on a shortest valid path.
-        """
         if np.array_equal(self.agent_pos, self.goal_pos):
             return set()
 
-        path = self.get_shortest_path()
-        if path is None or len(path) < 2:
+        shortest = self._shortest_distance(self.agent_pos, self.goal_pos)
+        if shortest is None:
             return set()
 
-        shortest_num_moves = len(path) - 1
-        optimal_actions = set()
-
+        optimal = set()
         for action, next_pos in self._neighbors(self.agent_pos):
-            sub_path = self._bfs_path(next_pos, self.goal_pos)
-            if sub_path is None:
-                continue
+            next_dist = self._shortest_distance(next_pos, self.goal_pos)
+            if next_dist is not None and 1 + next_dist == shortest:
+                optimal.add(action)
 
-            sub_num_moves = len(sub_path) - 1
-            if 1 + sub_num_moves == shortest_num_moves:
-                optimal_actions.add(action)
+        return optimal
 
-        return optimal_actions
+    def get_optimal_action_names(self):
+        return [self.action_to_name[a] for a in sorted(self.get_optimal_actions())]
 
-    def get_optimal_action(self):
-        optimal_actions = self.get_optimal_actions()
-        if not optimal_actions:
-            return None
-        return sorted(optimal_actions)[0]
+    def get_optimal_relative_action_names(self):
+        return [
+            self.relative_action_to_name[(a - self.agent_facing) % 4]
+            for a in sorted(self.get_optimal_actions())
+        ]
 
-    def get_optimal_action_name(self):
-        action = self.get_optimal_action()
-        if action is None:
-            return None
-        return self.action_to_name[action]
+    def export_state(self):
+        return {
+            "size": self.size,
+            "obstacle_density": self.obstacle_density,
+            "max_steps": self.max_steps,
+            "seed": self.last_seed,
+            "agent": self.agent_pos.tolist(),
+            "goal": self.goal_pos.tolist(),
+            "obstacles": self.obstacles.tolist(),
+            "facing": int(self.agent_facing),
+        }
 
-    def absolute_to_relative_action(self, absolute_action):
-        if absolute_action is None:
-            return None
-        return (absolute_action - self.agent_facing) % 4
-
-    def get_optimal_relative_action(self):
-        absolute_action = self.get_optimal_action()
-        if absolute_action is None:
-            return None
-        return self.absolute_to_relative_action(absolute_action)
-
-    def get_optimal_relative_action_name(self):
-        relative_action = self.get_optimal_relative_action()
-        if relative_action is None:
-            return None
-        return self.relative_action_to_name[relative_action]
+    def load_state(self, state):
+        self.current_step = 0
+        self.last_seed = state.get("seed")
+        self.agent_pos = np.array(state["agent"], dtype=np.int32)
+        self.goal_pos = np.array(state["goal"], dtype=np.int32)
+        self.obstacles = np.array(state["obstacles"], dtype=np.int32)
+        self.agent_facing = int(state["facing"])
+        return self._get_obs(), self._get_info()
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
 
         self.current_step = 0
+        self.last_seed = seed
+
+        if options and "state" in options:
+            return self.load_state(copy.deepcopy(options["state"]))
 
         while True:
-            self._place_obstacles()
-            self.agent_pos = self._random_empty_cell()
+            self.obstacles = np.zeros((self.size, self.size), dtype=np.int32)
 
-            while True:
-                self.goal_pos = self._random_empty_cell()
-                if not np.array_equal(self.goal_pos, self.agent_pos):
+            total = self.size * self.size
+            num_obstacles = int(total * self.obstacle_density)
+
+            indices = self.np_random.choice(total, size=num_obstacles, replace=False)
+            for idx in indices:
+                r, c = divmod(idx, self.size)
+                self.obstacles[r, c] = 1
+
+            self.agent_pos = self.np_random.integers(0, self.size, size=2)
+            self.goal_pos = self.np_random.integers(0, self.size, size=2)
+
+            if not np.array_equal(self.agent_pos, self.goal_pos):
+                if not self.ensure_path or self._bfs_path(self.agent_pos, self.goal_pos):
                     break
 
-            if not self.ensure_path or self._bfs_path(self.agent_pos, self.goal_pos) is not None:
-                break
-
         self.agent_facing = int(self.np_random.integers(0, 4))
-
-        observation = self._get_obs()
-        info = self._get_info()
-        return observation, info
+        return self._get_obs(), self._get_info()
 
     def step(self, action):
         self.current_step += 1
 
         direction = self.action_to_direction[action]
-        proposed_pos = self.agent_pos + direction
+        proposed = self.agent_pos + direction
 
-        hit_wall = not self._in_bounds(proposed_pos)
+        hit_wall = not self._in_bounds(proposed)
         hit_obstacle = False
 
         if not hit_wall:
-            proposed_pos = proposed_pos.astype(np.int32)
-            if self._is_obstacle(proposed_pos):
+            if self._is_obstacle(proposed):
                 hit_obstacle = True
             else:
-                self.agent_pos = proposed_pos
+                self.agent_pos = proposed
                 self.agent_facing = action
 
         terminated = np.array_equal(self.agent_pos, self.goal_pos)
         truncated = self.current_step >= self.max_steps
 
-        if terminated:
-            reward = 10
-        elif hit_wall or hit_obstacle:
-            reward = -2
-        else:
-            reward = -1
+        reward = 10 if terminated else -2 if (hit_wall or hit_obstacle) else -1
 
-        observation = self._get_obs()
+        obs = self._get_obs()
         info = self._get_info()
-        info["hit_wall"] = bool(hit_wall)
-        info["hit_obstacle"] = bool(hit_obstacle)
+        info["hit_wall"] = hit_wall
+        info["hit_obstacle"] = hit_obstacle
 
-        return observation, reward, terminated, truncated, info
+        return obs, reward, terminated, truncated, info
 
-    def render(self):
+    def render_text(self):
         grid = [["." for _ in range(self.size)] for _ in range(self.size)]
 
         for r in range(self.size):
@@ -294,14 +259,14 @@ class SimpleGridWorld(gym.Env):
         ar, ac = self.agent_pos
         gr, gc = self.goal_pos
 
-        grid[gr][gc] = "G"
-        grid[ar][ac] = "A"
+        if (ar, ac) == (gr, gc):
+            grid[gr][gc] = "*"
+        else:
+            grid[gr][gc] = "G"
+            grid[ar][ac] = self.facing_to_symbol[self.agent_facing]
 
-        print("\nGrid:")
+        lines = ["Grid:"]
         for row in grid:
-            print(" ".join(row))
-        print(f"Facing: {self.facing_to_name[self.agent_facing]}")
-        print()
+            lines.append(" ".join(row))
 
-    def close(self):
-        pass
+        return "\n".join(lines)
