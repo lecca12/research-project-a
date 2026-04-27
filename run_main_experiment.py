@@ -2,39 +2,27 @@ import json
 from pathlib import Path
 
 from gridworld import SimpleGridWorld
-from experiment_utils import run_episode
+from experiment_utils import generate_fixed_states, run_episode
 from llm_policy import make_openai_policy_fn
 
 
 def make_experiment_conditions():
     return [
-        {"grid_size": 5, "obstacle_density": 0.10, "mode": "allocentric"},
-        {"grid_size": 5, "obstacle_density": 0.10, "mode": "egocentric"},
-        {"grid_size": 5, "obstacle_density": 0.30, "mode": "allocentric"},
-        {"grid_size": 5, "obstacle_density": 0.30, "mode": "egocentric"},
-        {"grid_size": 8, "obstacle_density": 0.10, "mode": "allocentric"},
-        {"grid_size": 8, "obstacle_density": 0.10, "mode": "egocentric"},
-        {"grid_size": 8, "obstacle_density": 0.30, "mode": "allocentric"},
-        {"grid_size": 8, "obstacle_density": 0.30, "mode": "egocentric"},
+        {"grid_size": 5, "obstacle_density": 0.10},
+        {"grid_size": 5, "obstacle_density": 0.30},
+        {"grid_size": 8, "obstacle_density": 0.10},
+        {"grid_size": 8, "obstacle_density": 0.30},
     ]
 
 
-def run_condition(
-    *,
-    grid_size,
-    obstacle_density,
-    mode,
-    seeds,
-    model="gpt-4o-mini",
-    temperature=0.0,
-    max_output_tokens=16,
-    verbose=False,
-):
-    env = SimpleGridWorld(
-        size=grid_size,
-        obstacle_density=obstacle_density,
-        ensure_path=True,
-    )
+def main():
+    num_states = 10
+    start_seed = 0
+
+    model = "gpt-4o-mini"
+    temperature = 0.0
+    max_output_tokens = 16
+    verbose = False
 
     policy_fn = make_openai_policy_fn(
         model=model,
@@ -42,84 +30,78 @@ def run_condition(
         max_output_tokens=max_output_tokens,
     )
 
-    results = []
-
-    print("\n" + "=" * 100)
-    print(
-        f"Running condition: size={grid_size}, density={obstacle_density}, "
-        f"mode={mode}, episodes={len(seeds)}"
-    )
-    print("=" * 100)
-
-    for idx, seed in enumerate(seeds, start=1):
-        print(f"[{idx}/{len(seeds)}] seed={seed}")
-
-        episode_result = run_episode(
-            env=env,
-            mode=mode,
-            policy_fn=policy_fn,
-            seed=seed,
-            verbose=verbose,
-        )
-
-        episode_result["grid_size"] = grid_size
-        episode_result["obstacle_density"] = obstacle_density
-        episode_result["model"] = model
-        episode_result["temperature"] = temperature
-        episode_result["max_output_tokens"] = max_output_tokens
-
-        results.append(episode_result)
-
-    return results
-
-
-def main():
-    # Adjust this first for your next run.
-    num_seeds = 10
-    seeds = list(range(num_seeds))
-
-    model = "gpt-4o-mini"
-    temperature = 0.0
-    max_output_tokens = 16
-    verbose = False
-
-    conditions = make_experiment_conditions()
     all_results = []
+    conditions = make_experiment_conditions()
 
     for condition in conditions:
-        condition_results = run_condition(
-            grid_size=condition["grid_size"],
-            obstacle_density=condition["obstacle_density"],
-            mode=condition["mode"],
-            seeds=seeds,
-            model=model,
-            temperature=temperature,
-            max_output_tokens=max_output_tokens,
-            verbose=verbose,
-        )
-        all_results.extend(condition_results)
+        grid_size = condition["grid_size"]
+        obstacle_density = condition["obstacle_density"]
+        max_steps = grid_size ** 2
 
-    output_path = Path("main_results.json")
-    with output_path.open("w", encoding="utf-8") as f:
+        print("\n" + "=" * 80)
+        print(
+            f"Running condition: grid={grid_size}x{grid_size}, "
+            f"density={obstacle_density}, states={num_states}, max_steps={max_steps}"
+        )
+        print("=" * 80)
+
+        fixed_states = generate_fixed_states(
+            size=grid_size,
+            obstacle_density=obstacle_density,
+            num_states=num_states,
+            max_steps=max_steps,
+            start_seed=start_seed,
+        )
+
+        for state_index, state in enumerate(fixed_states):
+            seed = state.get("seed")
+            print(f"State {state_index + 1}/{num_states}, seed={seed}")
+
+            for mode in ["allocentric", "egocentric"]:
+                env = SimpleGridWorld(
+                    size=grid_size,
+                    obstacle_density=obstacle_density,
+                    max_steps=max_steps,
+                )
+
+                result = run_episode(
+                    env=env,
+                    mode=mode,
+                    policy_fn=policy_fn,
+                    fixed_state=state,
+                    verbose=verbose,
+                )
+
+                result["grid_size"] = grid_size
+                result["obstacle_density"] = obstacle_density
+                result["max_steps"] = max_steps
+                result["model"] = model
+                result["temperature"] = temperature
+                result["max_output_tokens"] = max_output_tokens
+
+                all_results.append(result)
+
+    with open("main_results.json", "w", encoding="utf-8") as f:
         json.dump(all_results, f, indent=2)
 
-    metadata_path = Path("main_results_metadata.json")
     metadata = {
-        "num_seeds": num_seeds,
-        "seeds": seeds,
+        "num_states": num_states,
+        "start_seed": start_seed,
+        "max_steps_rule": "grid_size_squared",
         "model": model,
         "temperature": temperature,
         "max_output_tokens": max_output_tokens,
         "conditions": conditions,
-        "output_file": str(output_path),
+        "modes": ["allocentric", "egocentric"],
+        "output_file": "main_results.json",
     }
-    with metadata_path.open("w", encoding="utf-8") as f:
+
+    with open("main_results_metadata.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
-    print("\nSaved files:")
-    print(f"- {output_path.resolve()}")
-    print(f"- {metadata_path.resolve()}")
-    print("\nDone.")
+    print("\nSaved:")
+    print("- main_results.json")
+    print("- main_results_metadata.json")
 
 
 if __name__ == "__main__":
