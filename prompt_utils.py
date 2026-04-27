@@ -1,54 +1,25 @@
-def obstacle_list_from_grid(obstacles):
-    coords = []
-    rows, cols = obstacles.shape
-    for r in range(rows):
-        for c in range(cols):
-            if obstacles[r, c] == 1:
-                coords.append((r, c))
-    return coords
-
-
-def _shared_grid_description(obs):
-    agent_r, agent_c = obs["agent"]
-    goal_r, goal_c = obs["goal"]
+def make_allocentric_prompt(obs):
+    agent = tuple(obs["agent"])
+    goal = tuple(obs["goal"])
     obstacles = obs["obstacles"]
 
-    obstacle_coords = obstacle_list_from_grid(obstacles)
-    obstacle_text = ", ".join([f"({r},{c})" for r, c in obstacle_coords])
-    if not obstacle_text:
-        obstacle_text = "none"
+    obstacle_cells = []
+    size = obstacles.shape[0]
+    for r in range(size):
+        for c in range(size):
+            if obstacles[r, c] == 1:
+                obstacle_cells.append((r, c))
 
-    coordinate_text = "\n".join(
-        [
-            "Coordinate system:",
-            "- Row 0 is the top (north), and row numbers increase downward (south).",
-            "- Column 0 is the left (west), and column numbers increase to the right (east).",
-        ]
-    )
+    prompt = f"""You are navigating a grid world.
 
-    return {
-        "grid_size": f"{obstacles.shape[0]} x {obstacles.shape[1]}",
-        "agent": (int(agent_r), int(agent_c)),
-        "goal": (int(goal_r), int(goal_c)),
-        "obstacles_text": obstacle_text,
-        "coordinate_text": coordinate_text,
-    }
+Grid size: {size} x {size}
+Agent position: {agent}
+Goal position: {goal}
+Obstacle cells: {', '.join(map(str, obstacle_cells)) if obstacle_cells else 'None'}
 
-
-def make_allocentric_prompt(obs):
-    shared = _shared_grid_description(obs)
-    agent_r, agent_c = shared["agent"]
-    goal_r, goal_c = shared["goal"]
-
-    prompt = f"""
-You are navigating a grid world.
-
-Grid size: {shared['grid_size']}
-Agent position: ({agent_r},{agent_c})
-Goal position: ({goal_r},{goal_c})
-Obstacle cells: {shared['obstacles_text']}
-
-{shared['coordinate_text']}
+Coordinate system:
+- Row 0 is the top (north), and row numbers increase downward (south).
+- Column 0 is the left (west), and column numbers increase to the right (east).
 
 Choose exactly one action from:
 north, east, south, west
@@ -56,39 +27,45 @@ north, east, south, west
 Rules:
 - Do not move into an obstacle.
 - Do not move outside the grid.
-- Choose the best next move that is part of a shortest valid path to the goal.
+- Choose the best next move on a shortest valid path to the goal.
 
 Answer with one word only:
 north, east, south, or west
-""".strip()
-
+"""
     return prompt
 
 
 def make_egocentric_prompt(obs):
-    shared = _shared_grid_description(obs)
-    agent_r, agent_c = shared["agent"]
-    goal_r, goal_c = shared["goal"]
+    agent = tuple(obs["agent"])
+    goal = tuple(obs["goal"])
+    obstacles = obs["obstacles"]
     facing = obs["facing"]
 
-    facing_names = {0: "north", 1: "east", 2: "south", 3: "west"}
+    size = obstacles.shape[0]
 
-    prompt = f"""
-You are navigating a grid world.
+    facing_names = ["north", "east", "south", "west"]
+    facing_name = facing_names[facing]
 
-Grid size: {shared['grid_size']}
-Your current position is ({agent_r},{agent_c})
-The goal is at ({goal_r},{goal_c})
-You are currently facing {facing_names[facing]}
-Obstacle cells: {shared['obstacles_text']}
+    obstacle_cells = []
+    for r in range(size):
+        for c in range(size):
+            if obstacles[r, c] == 1:
+                obstacle_cells.append((r, c))
 
-{shared['coordinate_text']}
+    prompt = f"""You are navigating a grid world.
 
-Relative action meanings:
-- forward = keep moving in the direction you are currently facing
-- right = turn/move 90 degrees to your right
-- backward = move in the opposite direction
-- left = turn/move 90 degrees to your left
+Grid size: {size} x {size}
+Agent position: {agent}
+Goal position: {goal}
+Obstacle cells: {', '.join(map(str, obstacle_cells)) if obstacle_cells else 'None'}
+
+The agent is currently facing {facing_name}.
+
+Relative actions:
+- forward: move in the direction you are facing
+- right: turn right relative to your current facing and move
+- backward: turn around and move
+- left: turn left relative to your current facing and move
 
 Choose exactly one action from:
 forward, right, backward, left
@@ -96,10 +73,9 @@ forward, right, backward, left
 Rules:
 - Do not move into an obstacle.
 - Do not move outside the grid.
-- Choose the best next move that is part of a shortest valid path to the goal.
+- Choose the best next move on a shortest valid path to the goal.
 
 Answer with one word only:
 forward, right, backward, or left
-""".strip()
-
+"""
     return prompt
