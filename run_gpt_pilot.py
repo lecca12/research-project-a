@@ -1,51 +1,58 @@
-"""
-Small pilot runner for manual sanity checks with GPT-4o-mini.
-
-Runs the same fixed grid states in both allocentric and egocentric modes,
-so you can compare the model on identical maps.
-"""
-
 import json
 
-from experiment_utils import generate_fixed_states, run_episode
 from gridworld import SimpleGridWorld
+from experiment_utils import generate_fixed_states, run_episode
 from llm_policy import make_openai_policy_fn
 
 
 def main():
+    # small pilot setup
+    size = 5
+    obstacle_density = 0.10
+    num_states = 3
+    max_steps = 20  # keep short for debugging
+
     policy_fn = make_openai_policy_fn(model="gpt-4o-mini")
 
+    # generate fixed states so both modes use identical maps
     fixed_states = generate_fixed_states(
-        size=5,
-        obstacle_density=0.10,
-        num_states=3,
-        max_steps=20,
-        ensure_path=True,
+        size=size,
+        obstacle_density=obstacle_density,
+        num_states=num_states,
+        max_steps=max_steps,
         start_seed=0,
     )
 
-    all_results = []
+    results = []
+
     for state in fixed_states:
         for mode in ["allocentric", "egocentric"]:
             env = SimpleGridWorld(
-                size=5,
-                obstacle_density=0.10,
-                max_steps=20,
-                ensure_path=True,
+                size=size,
+                obstacle_density=obstacle_density,
+                max_steps=max_steps,
             )
-            result = run_episode(
+
+            episode_result = run_episode(
                 env=env,
                 mode=mode,
                 policy_fn=policy_fn,
                 fixed_state=state,
-                verbose=True,
+                verbose=True,  # important for debugging
             )
-            all_results.append(result)
 
+            # add metadata
+            episode_result["grid_size"] = size
+            episode_result["obstacle_density"] = obstacle_density
+            episode_result["model"] = "gpt-4o-mini"
+
+            results.append(episode_result)
+
+    # save results
     with open("pilot_results.json", "w", encoding="utf-8") as f:
-        json.dump(all_results, f, indent=2)
+        json.dump(results, f, indent=2)
 
-    print("Saved pilot results to pilot_results.json")
+    print("\nSaved pilot results to pilot_results.json")
 
 
 if __name__ == "__main__":
