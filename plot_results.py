@@ -20,12 +20,10 @@ def safe_div(numerator, denominator):
     return numerator / denominator
 
 
-# --- UPDATED: cleaner labels ---
 LABEL_MAP = {
     "directional_or_detour_error": "Directional",
     "obstacle_blindness": "Obstacle",
     "boundary_error": "Boundary",
-    "success": "Success",
 }
 
 
@@ -42,20 +40,25 @@ def classify_error(step):
     return "correct"
 
 
-# --- UPDATED: include success category ---
-def get_first_error_or_success(step_logs):
+def get_first_error(step_logs):
+    """
+    Thesis-consistent:
+    returns the first non-correct error in the episode.
+    If the episode has no errors, return None.
+    """
     for step in step_logs:
         error = classify_error(step)
         if error != "correct":
             return error
-    return "success"
+
+    return None
 
 
 def analyze(results):
     summary = defaultdict(lambda: {
         "episodes": 0,
         "successes": 0,
-        "first_events": defaultdict(int),
+        "first_errors": defaultdict(int),
     })
 
     for episode in results:
@@ -70,8 +73,10 @@ def analyze(results):
         if episode.get("reached_goal", False):
             summary[key]["successes"] += 1
 
-        first_event = get_first_error_or_success(episode.get("step_logs", []))
-        summary[key]["first_events"][first_event] += 1
+        first_error = get_first_error(episode.get("step_logs", []))
+
+        if first_error is not None:
+            summary[key]["first_errors"][first_error] += 1
 
     return summary
 
@@ -83,19 +88,18 @@ def get_conditions(summary):
     )
 
 
-def get_event_types(summary):
-    event_types = set()
+def get_error_types(summary):
+    error_types = set()
     for data in summary.values():
-        event_types.update(data["first_events"].keys())
+        error_types.update(data["first_errors"].keys())
 
     order = [
-        "success",
         "directional_or_detour_error",
         "obstacle_blindness",
         "boundary_error",
     ]
 
-    return [e for e in order if e in event_types]
+    return [e for e in order if e in error_types]
 
 
 def condition_label(grid_size, density):
@@ -141,9 +145,9 @@ def plot_success_rate(summary, output_dir):
     plt.close()
 
 
-def plot_first_event(summary, output_dir):
+def plot_first_error(summary, output_dir):
     conditions = get_conditions(summary)
-    event_types = get_event_types(summary)
+    error_types = get_error_types(summary)
 
     labels = []
     for grid, density in conditions:
@@ -155,7 +159,7 @@ def plot_first_event(summary, output_dir):
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    for event_type in event_types:
+    for error_type in error_types:
         values = []
 
         for grid, density in conditions:
@@ -166,31 +170,29 @@ def plot_first_event(summary, output_dir):
                     values.append(0.0)
                     continue
 
-                count = data["first_events"].get(event_type, 0)
+                count = data["first_errors"].get(error_type, 0)
                 values.append(100 * safe_div(count, data["episodes"]))
 
         ax.bar(
             x,
             values,
             bottom=bottoms,
-            label=LABEL_MAP[event_type],
+            label=LABEL_MAP[error_type],
         )
 
         bottoms = [b + v for b, v in zip(bottoms, values)]
 
-    ax.set_title("First Event per Episode")
-    ax.set_ylabel("Percentage (%)")
+    ax.set_title("First Error per Episode")
+    ax.set_ylabel("Percentage of Episodes (%)")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=30, ha="right")
     ax.set_ylim(0, 100)
 
-    # --- FIX: move legend outside ---
     ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
-
     ax.grid(axis="y", alpha=0.3)
 
     fig.tight_layout()
-    fig.savefig(output_dir / "first_event.png", bbox_inches="tight")
+    fig.savefig(output_dir / "first_error.png", bbox_inches="tight")
     plt.close()
 
 
@@ -208,7 +210,7 @@ def main():
     summary = analyze(results)
 
     plot_success_rate(summary, output_dir)
-    plot_first_event(summary, output_dir)
+    plot_first_error(summary, output_dir)
 
     print("Saved plots to:", output_dir)
 
