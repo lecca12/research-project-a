@@ -1,4 +1,3 @@
-
 import argparse
 import json
 from collections import defaultdict
@@ -21,16 +20,16 @@ def safe_div(numerator, denominator):
     return numerator / denominator
 
 
+# --- UPDATED: cleaner labels ---
+LABEL_MAP = {
+    "directional_or_detour_error": "Directional",
+    "obstacle_blindness": "Obstacle",
+    "boundary_error": "Boundary",
+    "success": "Success",
+}
+
+
 def classify_error(step):
-    """
-    First-error taxonomy.
-
-    We use first error per episode to avoid repeated stuck-state errors
-    dominating the results.
-    """
-    if step.get("parse_failure", False) or not step.get("is_valid_format", True):
-        return "parse_failure"
-
     if step.get("hit_obstacle", False):
         return "obstacle_blindness"
 
@@ -43,19 +42,20 @@ def classify_error(step):
     return "correct"
 
 
-def get_first_error(step_logs):
+# --- UPDATED: include success category ---
+def get_first_error_or_success(step_logs):
     for step in step_logs:
         error = classify_error(step)
         if error != "correct":
             return error
-    return None
+    return "success"
 
 
 def analyze(results):
     summary = defaultdict(lambda: {
         "episodes": 0,
         "successes": 0,
-        "first_errors": defaultdict(int),
+        "first_events": defaultdict(int),
     })
 
     for episode in results:
@@ -70,9 +70,8 @@ def analyze(results):
         if episode.get("reached_goal", False):
             summary[key]["successes"] += 1
 
-        first_error = get_first_error(episode.get("step_logs", []))
-        if first_error is not None:
-            summary[key]["first_errors"][first_error] += 1
+        first_event = get_first_error_or_success(episode.get("step_logs", []))
+        summary[key]["first_events"][first_event] += 1
 
     return summary
 
@@ -84,25 +83,23 @@ def get_conditions(summary):
     )
 
 
-def get_error_types(summary):
-    error_types = set()
+def get_event_types(summary):
+    event_types = set()
     for data in summary.values():
-        error_types.update(data["first_errors"].keys())
+        event_types.update(data["first_events"].keys())
 
-    preferred_order = [
+    order = [
+        "success",
         "directional_or_detour_error",
         "obstacle_blindness",
         "boundary_error",
-        "parse_failure",
     ]
 
-    ordered = [e for e in preferred_order if e in error_types]
-    ordered += sorted(error_types - set(ordered))
-    return ordered
+    return [e for e in order if e in event_types]
 
 
 def condition_label(grid_size, density):
-    return f"{grid_size}x{grid_size}\n{int(float(density) * 100)}% obs"
+    return f"{grid_size}x{grid_size}\n{int(float(density) * 100)}%"
 
 
 def plot_success_rate(summary, output_dir):
@@ -126,37 +123,27 @@ def plot_success_rate(summary, output_dir):
             else:
                 target.append(100 * safe_div(data["successes"], data["episodes"]))
 
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(8, 5))
 
     ax.bar([i - width / 2 for i in x], allocentric_rates, width, label="Allocentric")
     ax.bar([i + width / 2 for i in x], egocentric_rates, width, label="Egocentric")
 
-    for i, value in enumerate(allocentric_rates):
-        ax.text(i - width / 2, value, f"{value:.0f}%", ha="center", va="bottom", fontsize=8)
-
-    for i, value in enumerate(egocentric_rates):
-        ax.text(i + width / 2, value, f"{value:.0f}%", ha="center", va="bottom", fontsize=8)
-
-    ax.set_title("Episode success rate by condition")
-    ax.set_ylabel("Success rate (%)")
-    ax.set_xlabel("Condition")
+    ax.set_title("Success Rate by Condition")
+    ax.set_ylabel("Success (%)")
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
-    ax.set_ylim(0, 105)
-    ax.legend(title="Prompt framing")
-    ax.grid(axis="y", alpha=0.25)
+    ax.set_ylim(0, 100)
+    ax.legend()
+    ax.grid(axis="y", alpha=0.3)
 
     fig.tight_layout()
-    output_path = output_dir / "success_rate_by_condition.png"
-    fig.savefig(output_path, dpi=220, bbox_inches="tight")
-    plt.close(fig)
-
-    return output_path
+    fig.savefig(output_dir / "success_rate.png")
+    plt.close()
 
 
-def plot_first_error_by_condition(summary, output_dir):
+def plot_first_event(summary, output_dir):
     conditions = get_conditions(summary)
-    error_types = get_error_types(summary)
+    event_types = get_event_types(summary)
 
     labels = []
     for grid, density in conditions:
@@ -168,7 +155,7 @@ def plot_first_error_by_condition(summary, output_dir):
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    for error_type in error_types:
+    for event_type in event_types:
         values = []
 
         for grid, density in conditions:
@@ -179,114 +166,51 @@ def plot_first_error_by_condition(summary, output_dir):
                     values.append(0.0)
                     continue
 
-                count = data["first_errors"].get(error_type, 0)
+                count = data["first_events"].get(event_type, 0)
                 values.append(100 * safe_div(count, data["episodes"]))
 
-        ax.bar(x, values, bottom=bottoms, label=error_type)
+        ax.bar(
+            x,
+            values,
+            bottom=bottoms,
+            label=LABEL_MAP[event_type],
+        )
+
         bottoms = [b + v for b, v in zip(bottoms, values)]
 
-    ax.set_title("First error per episode by condition")
-    ax.set_ylabel("Episodes with first error type (%)")
-    ax.set_xlabel("Condition and prompt framing")
+    ax.set_title("First Event per Episode")
+    ax.set_ylabel("Percentage (%)")
     ax.set_xticks(x)
     ax.set_xticklabels(labels, rotation=30, ha="right")
-    ax.set_ylim(0, 105)
-    ax.legend(title="First error type")
-    ax.grid(axis="y", alpha=0.25)
+    ax.set_ylim(0, 100)
+
+    # --- FIX: move legend outside ---
+    ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+
+    ax.grid(axis="y", alpha=0.3)
 
     fig.tight_layout()
-    output_path = output_dir / "first_error_by_condition.png"
-    fig.savefig(output_path, dpi=220, bbox_inches="tight")
-    plt.close(fig)
-
-    return output_path
-
-
-def write_summary_text(summary, output_dir):
-    conditions = get_conditions(summary)
-    lines = []
-
-    lines.append("RESULT SUMMARY")
-    lines.append("=" * 80)
-    lines.append("")
-    lines.append("Success rate by condition:")
-    lines.append("")
-
-    for grid, density in conditions:
-        lines.append(f"{grid}x{grid}, obstacle density={density}")
-
-        for mode in MODES:
-            data = summary.get((grid, density, mode), None)
-            if data is None:
-                lines.append(f"  {mode}: no data")
-                continue
-
-            success_rate = 100 * safe_div(data["successes"], data["episodes"])
-            lines.append(
-                f"  {mode}: {data['successes']}/{data['episodes']} "
-                f"successful episodes ({success_rate:.1f}%)"
-            )
-
-        lines.append("")
-
-    lines.append("")
-    lines.append("First error per episode:")
-    lines.append("")
-
-    for grid, density in conditions:
-        lines.append(f"{grid}x{grid}, obstacle density={density}")
-
-        for mode in MODES:
-            data = summary.get((grid, density, mode), None)
-            if data is None:
-                lines.append(f"  {mode}: no data")
-                continue
-
-            lines.append(f"  {mode}:")
-            if not data["first_errors"]:
-                lines.append("    no first errors")
-            else:
-                for error_type, count in sorted(data["first_errors"].items()):
-                    pct = 100 * safe_div(count, data["episodes"])
-                    lines.append(f"    {error_type}: {count}/{data['episodes']} ({pct:.1f}%)")
-
-        lines.append("")
-
-    output_path = output_dir / "results_summary.txt"
-    output_path.write_text("\n".join(lines), encoding="utf-8")
-    return output_path
+    fig.savefig(output_dir / "first_event.png", bbox_inches="tight")
+    plt.close()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Plot simplified GridWorld experiment results.")
-    parser.add_argument(
-        "json_path",
-        nargs="?",
-        default="main_results.json",
-        help="Path to results JSON file.",
-    )
-    parser.add_argument(
-        "--output-dir",
-        default="plots",
-        help="Folder to save plots.",
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("json_path", default="main_results.json", nargs="?")
+    parser.add_argument("--output-dir", default="plots")
+
     args = parser.parse_args()
 
-    json_path = Path(args.json_path)
     output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(exist_ok=True)
 
-    results = load_results(json_path)
+    results = load_results(args.json_path)
     summary = analyze(results)
 
-    success_plot = plot_success_rate(summary, output_dir)
-    error_plot = plot_first_error_by_condition(summary, output_dir)
-    summary_text = write_summary_text(summary, output_dir)
+    plot_success_rate(summary, output_dir)
+    plot_first_event(summary, output_dir)
 
-    print("Saved:")
-    print(f"- {success_plot}")
-    print(f"- {error_plot}")
-    print(f"- {summary_text}")
+    print("Saved plots to:", output_dir)
 
 
 if __name__ == "__main__":
