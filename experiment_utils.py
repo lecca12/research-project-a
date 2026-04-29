@@ -124,10 +124,6 @@ def run_episode(env, mode, policy_fn, fixed_state=None, verbose=False):
                 "is_correct": False,
                 "parse_failure": True,
                 "reward": None,
-                "hit_wall": False,
-                "hit_obstacle": False,
-                "terminated": False,
-                "truncated": False,
                 "grid_text": grid_text,
             })
             break
