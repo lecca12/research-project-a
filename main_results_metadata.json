@@ -1,61 +1,31 @@
 {
-  "num_seeds": 10,
-  "seeds": [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9
-  ],
+  "num_states": 10,
+  "start_seed": 0,
+  "max_steps_rule": "grid_size_squared",
   "model": "gpt-4o-mini",
   "temperature": 0.0,
   "max_output_tokens": 16,
   "conditions": [
     {
       "grid_size": 5,
-      "obstacle_density": 0.1,
-      "mode": "allocentric"
+      "obstacle_density": 0.1
     },
     {
       "grid_size": 5,
-      "obstacle_density": 0.1,
-      "mode": "egocentric"
-    },
-    {
-      "grid_size": 5,
-      "obstacle_density": 0.3,
-      "mode": "allocentric"
-    },
-    {
-      "grid_size": 5,
-      "obstacle_density": 0.3,
-      "mode": "egocentric"
+      "obstacle_density": 0.3
     },
     {
       "grid_size": 8,
-      "obstacle_density": 0.1,
-      "mode": "allocentric"
+      "obstacle_density": 0.1
     },
     {
       "grid_size": 8,
-      "obstacle_density": 0.1,
-      "mode": "egocentric"
-    },
-    {
-      "grid_size": 8,
-      "obstacle_density": 0.3,
-      "mode": "allocentric"
-    },
-    {
-      "grid_size": 8,
-      "obstacle_density": 0.3,
-      "mode": "egocentric"
+      "obstacle_density": 0.3
     }
+  ],
+  "modes": [
+    "allocentric",
+    "egocentric"
   ],
   "output_file": "main_results.json"
 }
