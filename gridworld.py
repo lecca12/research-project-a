@@ -210,12 +210,23 @@ class SimpleGridWorld(gym.Env):
                 r, c = divmod(idx, self.size)
                 self.obstacles[r, c] = 1
 
-            self.agent_pos = self.np_random.integers(0, self.size, size=2)
-            self.goal_pos = self.np_random.integers(0, self.size, size=2)
-
-            if not np.array_equal(self.agent_pos, self.goal_pos):
-                if not self.ensure_path or self._bfs_path(self.agent_pos, self.goal_pos):
+            #FIX: agent must be on free cell
+            while True:
+                self.agent_pos = self.np_random.integers(0, self.size, size=2)
+                if not self._is_obstacle(self.agent_pos):
                     break
+
+            #FIX: goal must be on free cell and not equal to agent
+            while True:
+                self.goal_pos = self.np_random.integers(0, self.size, size=2)
+                if (
+                    not self._is_obstacle(self.goal_pos)
+                    and not np.array_equal(self.goal_pos, self.agent_pos)
+                ):
+                    break
+
+            if not self.ensure_path or self._bfs_path(self.agent_pos, self.goal_pos):
+                break
 
         self.agent_facing = int(self.np_random.integers(0, 4))
         return self._get_obs(), self._get_info()
