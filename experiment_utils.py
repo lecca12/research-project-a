@@ -119,9 +119,11 @@ def run_episode(env, mode, policy_fn, fixed_state=None, verbose=False):
                 "facing": int(obs["facing"]),
                 "raw_model_answer": model_text,
                 "parsed_action": None,
+                "optimal_actions": list(optimal_actions),
                 "is_valid_format": False,
                 "is_correct": False,
                 "parse_failure": True,
+                "reward": None,
                 "grid_text": grid_text,
             })
             break
@@ -135,9 +137,11 @@ def run_episode(env, mode, policy_fn, fixed_state=None, verbose=False):
             "facing": int(obs["facing"]),
             "raw_model_answer": model_text,
             "parsed_action": action,
+            "optimal_actions": list(optimal_actions),
             "is_valid_format": True,
             "is_correct": correct,
             "parse_failure": False,
+            "reward": reward,
             "hit_wall": info["hit_wall"],
             "hit_obstacle": info["hit_obstacle"],
             "terminated": terminated,
@@ -162,5 +166,8 @@ def run_episode(env, mode, policy_fn, fixed_state=None, verbose=False):
         "seed": seed,
         "num_steps": len(step_logs),
         "reached_goal": bool(step_logs and step_logs[-1].get("terminated")),
+        "final_state": obs["agent"].tolist(),
+        "max_steps": env.max_steps,
+        "prompt": prompt,
         "step_logs": step_logs,
     }
