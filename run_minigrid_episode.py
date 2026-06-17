@@ -45,7 +45,7 @@ def get_prompt(env, mode):
 
 def run_minigrid_episode(mode, seed=0, max_steps=64, verbose=True):
     env = MiniGridCardinalWrapper(
-        env_name="MiniGrid-Empty-8x8-v0",
+        env_name="MiniGrid-SimpleCrossingS9N1-v0",
         seed=seed,
     )
     env.reset(seed=seed)
