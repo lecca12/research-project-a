@@ -21,6 +21,22 @@ RELATIVE_ACTIONS = {
 }
 
 
+def make_json_safe(obj):
+    if hasattr(obj, "item"):
+        return obj.item()
+
+    if isinstance(obj, tuple):
+        return [make_json_safe(x) for x in obj]
+
+    if isinstance(obj, list):
+        return [make_json_safe(x) for x in obj]
+
+    if isinstance(obj, dict):
+        return {k: make_json_safe(v) for k, v in obj.items()}
+
+    return obj
+
+
 def parse_minigrid_action(text, mode, env):
     word = normalize_answer(text)
 
@@ -185,7 +201,6 @@ def main():
     seeds = list(range(10))
     modes = ["allocentric", "egocentric"]
 
-    # SimpleCrossingS9N1 is 9x9, so this matches the GridWorld rule.
     max_steps = 9 ** 2
 
     model = "gpt-4o-mini"
@@ -238,7 +253,7 @@ def main():
             )
 
     with output_path.open("w", encoding="utf-8") as f:
-        json.dump(all_results, f, indent=2)
+        json.dump(make_json_safe(all_results), f, indent=2)
 
     metadata = {
         "env_name": env_name,
@@ -254,7 +269,7 @@ def main():
     }
 
     with metadata_path.open("w", encoding="utf-8") as f:
-        json.dump(metadata, f, indent=2)
+        json.dump(make_json_safe(metadata), f, indent=2)
 
     print("\nSaved:")
     print("-", output_path)
