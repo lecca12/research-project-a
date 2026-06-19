@@ -411,8 +411,7 @@ def main():
     modes = ["allocentric", "egocentric"]
 
     # Start with baseline only. Later change to:
-    # policy_types = ["baseline", "legality_shield"]
-    policy_types = ["baseline"]
+    policy_types = ["baseline", "legality_shield"]
 
     early_stop_repeats = 3
 
