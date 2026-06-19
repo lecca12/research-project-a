@@ -1,0 +1,32 @@
+{
+  "env_name": "MiniGrid-SimpleCrossingS9N1-v0",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "num_seeds": 10,
+  "modes": [
+    "allocentric",
+    "egocentric"
+  ],
+  "policy_types": [
+    "baseline",
+    "legality_shield"
+  ],
+  "max_steps": 81,
+  "early_stop_repeats": 3,
+  "save_traces": true,
+  "max_steps_rule": "grid_size_squared",
+  "model": "gpt-4o-mini",
+  "temperature": 0.0,
+  "max_output_tokens": 16,
+  "output_file": "minigrid_results.json"
+}
