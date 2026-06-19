@@ -5,24 +5,16 @@ from collections import defaultdict
 from custom_minigrid_wrapper import (
     CustomMiniGridWrapper,
     generate_custom_minigrid_states,
+    ACTION_TO_DELTA,
+    ACTION_NAMES,
+    RELATIVE_ACTION_NAMES,
 )
 from experiment_utils import normalize_answer
 from llm_policy import make_openai_policy_fn
 
 
-ABSOLUTE_ACTIONS = {
-    "north": 0,
-    "east": 1,
-    "south": 2,
-    "west": 3,
-}
-
-RELATIVE_ACTIONS = {
-    "forward": 0,
-    "right": 1,
-    "backward": 2,
-    "left": 3,
-}
+ABSOLUTE_ACTIONS = {"north": 0, "east": 1, "south": 2, "west": 3}
+RELATIVE_ACTIONS = {"forward": 0, "right": 1, "backward": 2, "left": 3}
 
 
 def make_json_safe(obj):
@@ -72,6 +64,127 @@ def classify_error(parse_failure, hit_wall, hit_obstacle, is_correct):
     return "correct"
 
 
+def get_legal_cardinal_actions(env):
+    state = env.get_state()
+    row, col = state["agent"]
+
+    legal = set()
+    for action, (dr, dc) in ACTION_TO_DELTA.items():
+        blocked, _ = env.is_blocked(row + dr, col + dc)
+        if not blocked:
+            legal.add(action)
+
+    return legal
+
+
+def cardinal_to_relative(action, facing):
+    # Facing convention: 0=east, 1=south, 2=west, 3=north
+    facing_to_cardinal = {0: 1, 1: 2, 2: 3, 3: 0}
+    cardinal_facing = facing_to_cardinal[facing]
+    return (action - cardinal_facing) % 4
+
+
+def legal_action_names(env, mode):
+    legal = get_legal_cardinal_actions(env)
+
+    if mode == "allocentric":
+        return [ACTION_NAMES[a] for a in sorted(legal)]
+
+    state = env.get_state()
+    facing = state["facing"]
+
+    names = []
+    for action in sorted(legal):
+        rel = cardinal_to_relative(action, facing)
+        names.append(RELATIVE_ACTION_NAMES[rel])
+
+    return names
+
+
+def make_legality_reprompt(original_prompt, raw_answer, legal_names, mode):
+    legal_text = ", ".join(legal_names)
+
+    if mode == "allocentric":
+        answer_line = f"Answer with one word only from: {legal_text}"
+    else:
+        answer_line = f"Answer with one word only from: {legal_text}"
+
+    return f"""{original_prompt}
+
+Your previous answer was: {raw_answer}
+
+That action is illegal from the current state because it would move into an obstacle or outside the grid.
+
+Choose a legal action instead.
+
+Legal actions available now:
+{legal_text}
+
+{answer_line}
+"""
+
+
+def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
+    """
+    Returns:
+        parsed_action, action_metadata
+    """
+
+    if policy_type == "baseline":
+        raw_answer = policy_fn(prompt)
+        parsed_action = parse_action(raw_answer, mode, env)
+
+        return parsed_action, {
+            "policy_type": policy_type,
+            "raw_model_answer": raw_answer,
+            "all_raw_answers": [raw_answer],
+            "shield_used": False,
+            "shield_reprompts": 0,
+            "legal_action_names": legal_action_names(env, mode),
+        }
+
+    if policy_type == "legality_shield":
+        legal_actions = get_legal_cardinal_actions(env)
+        legal_names = legal_action_names(env, mode)
+
+        all_raw_answers = []
+        current_prompt = prompt
+
+        for attempt in range(max_reprompts + 1):
+            raw_answer = policy_fn(current_prompt)
+            all_raw_answers.append(raw_answer)
+
+            parsed_action = parse_action(raw_answer, mode, env)
+
+            if parsed_action is not None and parsed_action in legal_actions:
+                return parsed_action, {
+                    "policy_type": policy_type,
+                    "raw_model_answer": raw_answer,
+                    "all_raw_answers": all_raw_answers,
+                    "shield_used": attempt > 0,
+                    "shield_reprompts": attempt,
+                    "legal_action_names": legal_names,
+                }
+
+            current_prompt = make_legality_reprompt(
+                original_prompt=prompt,
+                raw_answer=raw_answer,
+                legal_names=legal_names,
+                mode=mode,
+            )
+
+        return parsed_action, {
+            "policy_type": policy_type,
+            "raw_model_answer": all_raw_answers[-1] if all_raw_answers else None,
+            "all_raw_answers": all_raw_answers,
+            "shield_used": True,
+            "shield_reprompts": max_reprompts,
+            "legal_action_names": legal_names,
+        }
+
+    raise ValueError(f"Unknown policy_type: {policy_type}")
+
+
 def should_early_stop(repeat_counts, state_before, parsed_action, threshold):
     if threshold is None:
         return False, None
@@ -102,12 +215,14 @@ def print_generated_states(fixed_states):
         )
         preview_env.reset(state=state)
 
+        current_state = preview_env.get_state()
+
         print(f"\nState {i + 1} (seed={state['seed']})")
         print(preview_env.render_text())
-        print("Agent:", preview_env.get_state()["agent"])
-        print("Goal:", preview_env.get_state()["goal"])
-        print("Facing:", preview_env.get_state()["facing_name"])
-        print("Obstacles:", preview_env.get_state()["obstacle_cells"])
+        print("Agent:", current_state["agent"])
+        print("Goal:", current_state["goal"])
+        print("Facing:", current_state["facing_name"])
+        print("Obstacles:", current_state["obstacle_cells"])
         print("Optimal allocentric:", preview_env.get_optimal_action_names())
         print("Optimal egocentric:", preview_env.get_optimal_relative_action_names())
 
@@ -117,6 +232,7 @@ def run_episode(
     mode,
     policy_fn,
     max_steps,
+    policy_type="baseline",
     early_stop_repeats=3,
     verbose=False,
 ):
@@ -140,24 +256,35 @@ def run_episode(
         grid_text = env.render_text()
         state_before = env.get_state()
 
-        raw_answer = policy_fn(prompt)
-        parsed_action = parse_action(raw_answer, mode, env)
+        parsed_action, action_meta = choose_action(
+            env=env,
+            mode=mode,
+            policy_fn=policy_fn,
+            policy_type=policy_type,
+            prompt=prompt,
+        )
 
+        raw_answer = action_meta["raw_model_answer"]
         parse_failure = parsed_action is None
         is_correct = (not parse_failure) and parsed_action in optimal_actions
 
         if parse_failure:
             step_logs.append({
                 "step": step,
+                "policy_type": policy_type,
                 "agent_pos": state_before["agent"],
                 "goal_pos": state_before["goal"],
                 "facing": state_before["facing"],
                 "facing_name": state_before["facing_name"],
                 "raw_model_answer": raw_answer,
+                "all_raw_answers": action_meta["all_raw_answers"],
                 "parsed_action": None,
                 "optimal_actions": sorted(optimal_actions),
                 "optimal_action_names": optimal_action_names,
                 "optimal_relative_action_names": optimal_relative_action_names,
+                "legal_action_names": action_meta["legal_action_names"],
+                "shield_used": action_meta["shield_used"],
+                "shield_reprompts": action_meta["shield_reprompts"],
                 "is_valid_format": False,
                 "is_correct": False,
                 "parse_failure": True,
@@ -195,16 +322,21 @@ def run_episode(
 
         step_logs.append({
             "step": step,
+            "policy_type": policy_type,
             "agent_pos": state_before["agent"],
             "goal_pos": state_before["goal"],
             "facing": state_before["facing"],
             "facing_name": state_before["facing_name"],
             "raw_model_answer": raw_answer,
+            "all_raw_answers": action_meta["all_raw_answers"],
             "parsed_action": parsed_action,
             "parsed_action_name": info["action_name"],
             "optimal_actions": sorted(optimal_actions),
             "optimal_action_names": optimal_action_names,
             "optimal_relative_action_names": optimal_relative_action_names,
+            "legal_action_names": action_meta["legal_action_names"],
+            "shield_used": action_meta["shield_used"],
+            "shield_reprompts": action_meta["shield_reprompts"],
             "is_valid_format": True,
             "is_correct": is_correct,
             "parse_failure": False,
@@ -226,14 +358,17 @@ def run_episode(
 
         if verbose:
             print("\n" + "=" * 80)
-            print(f"Mode={mode}, step={step}")
+            print(f"Policy={policy_type}, mode={mode}, step={step}")
             print(grid_text)
             print("Raw answer:", raw_answer)
+            print("All raw answers:", action_meta["all_raw_answers"])
             print("Parsed:", parsed_action, info["action_name"])
+            print("Legal actions:", action_meta["legal_action_names"])
             print("Optimal allocentric:", optimal_action_names)
             print("Optimal egocentric:", optimal_relative_action_names)
             print("Correct:", is_correct)
             print("Error:", error_type)
+            print("Shield used:", action_meta["shield_used"])
             print("Early stop:", stop_now)
 
         if terminated:
@@ -246,6 +381,7 @@ def run_episode(
     final_state = env.get_state()
 
     return {
+        "policy_type": policy_type,
         "mode": mode,
         "seed": fixed_state.get("seed"),
         "grid_size": fixed_state["size"],
@@ -274,10 +410,12 @@ def main():
     start_seed = 0
     modes = ["allocentric", "egocentric"]
 
-    # Diagnostic speed-up. Set to None for final no-shortcut runs.
+    # Start with baseline only. Later change to:
+    # policy_types = ["baseline", "legality_shield"]
+    policy_types = ["baseline"]
+
     early_stop_repeats = 3
 
-    # Set True first to inspect maps before spending API calls.
     preview_only = False
     print_generated_grids = True
 
@@ -295,6 +433,7 @@ def main():
     print("Conditions:", conditions)
     print("States per condition:", num_states)
     print("Modes:", modes)
+    print("Policy types:", policy_types)
     print("Early stop repeats:", early_stop_repeats)
     print("Preview only:", preview_only)
     print("Print generated grids:", print_generated_grids)
@@ -334,30 +473,32 @@ def main():
             seed = state["seed"]
             print(f"\nState {state_index + 1}/{num_states}, seed={seed}")
 
-            for mode in modes:
-                print(f"  Running mode: {mode}")
+            for policy_type in policy_types:
+                for mode in modes:
+                    print(f"  Running policy={policy_type}, mode={mode}")
 
-                result = run_episode(
-                    fixed_state=state,
-                    mode=mode,
-                    policy_fn=policy_fn,
-                    max_steps=max_steps,
-                    early_stop_repeats=early_stop_repeats,
-                    verbose=False,
-                )
+                    result = run_episode(
+                        fixed_state=state,
+                        mode=mode,
+                        policy_fn=policy_fn,
+                        max_steps=max_steps,
+                        policy_type=policy_type,
+                        early_stop_repeats=early_stop_repeats,
+                        verbose=False,
+                    )
 
-                result["model"] = model
-                result["temperature"] = temperature
-                result["max_output_tokens"] = max_output_tokens
+                    result["model"] = model
+                    result["temperature"] = temperature
+                    result["max_output_tokens"] = max_output_tokens
 
-                all_results.append(result)
+                    all_results.append(result)
 
-                print(
-                    f"    reached_goal={result['reached_goal']}, "
-                    f"early_stopped={result['early_stopped']}, "
-                    f"steps={result['num_steps']}, "
-                    f"final_state={result['final_state']}"
-                )
+                    print(
+                        f"    reached_goal={result['reached_goal']}, "
+                        f"early_stopped={result['early_stopped']}, "
+                        f"steps={result['num_steps']}, "
+                        f"final_state={result['final_state']}"
+                    )
 
     if preview_only:
         print("\nPreview only enabled. No API calls were made and no results were saved.")
@@ -371,6 +512,7 @@ def main():
         "num_states": num_states,
         "start_seed": start_seed,
         "modes": modes,
+        "policy_types": policy_types,
         "early_stop_repeats": early_stop_repeats,
         "preview_only": preview_only,
         "print_generated_grids": print_generated_grids,
