@@ -1,0 +1,405 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: legality_shield
+Mode: allocentric
+Seed: 9
+Reached goal: True
+Early stopped: False
+Steps: 12
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(1)), 0, 1)
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(2)), 0, 1)
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(3)), 0, 1)
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['south', 'east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(4)), 0, 1)
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . > . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(5)), 0, 2)
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X v X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'south']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(2), np.int64(5)), 1, 2)
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X . X X X
+X . . . . v . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['left', 'forward']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(3), np.int64(5)), 1, 1)
+
+================================================================================
+
+STEP 7
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X . X X X
+X . . . . . > . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(3), np.int64(6)), 0, 1)
+
+================================================================================
+
+STEP 8
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X . X X X
+X . . . . . . > X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(3), np.int64(7)), 0, 2)
+
+================================================================================
+
+STEP 9
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . v X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(4), np.int64(7)), 1, 2)
+
+================================================================================
+
+STEP 10
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . v X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['east', 'south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(7)), 1, 2)
+
+================================================================================
+
+STEP 11
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X X X X X . X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . v X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['east', 'south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Terminated: True
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(6), np.int64(7)), 1, 2)
+
+================================================================================
+

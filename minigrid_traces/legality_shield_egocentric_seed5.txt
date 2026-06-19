@@ -1,0 +1,537 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: legality_shield
+Mode: egocentric
+Seed: 5
+Reached goal: False
+Early stopped: True
+Steps: 16
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['forward', 'right']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(1)), 0, 1)
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['forward', 'right', 'backward']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(2)), 0, 1)
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['forward', 'right']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['right', 'backward']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(1), np.int64(3)), 0, 2)
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . v X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(2), np.int64(3)), 1, 2)
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . v X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(3), np.int64(3)), 1, 2)
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . v X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(4), np.int64(3)), 1, 2)
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . v X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(3)), 1, 2)
+
+================================================================================
+
+STEP 7
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . v X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: False
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(6), np.int64(3)), 1, 3)
+
+================================================================================
+
+STEP 8
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . < . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['backward', 'left']
+Legal actions: ['right', 'backward', 'left', 'forward']
+Correct: False
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(6), np.int64(2)), 2, 0)
+
+================================================================================
+
+STEP 9
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . ^ . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['right', 'backward']
+Legal actions: ['forward', 'right', 'backward', 'left']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(2)), 3, 1)
+
+================================================================================
+
+STEP 10
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . > X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['forward', 'right']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['left', 'right', 'backward']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(3)), 0, 2)
+
+================================================================================
+
+STEP 11
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . v X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: False
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(6), np.int64(3)), 1, 3)
+
+================================================================================
+
+STEP 12
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . < . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['backward', 'left']
+Legal actions: ['right', 'backward', 'left', 'forward']
+Correct: False
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(6), np.int64(2)), 2, 0)
+
+================================================================================
+
+STEP 13
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . ^ . X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['right', 'backward']
+Legal actions: ['forward', 'right', 'backward', 'left']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(2)), 3, 1)
+
+================================================================================
+
+STEP 14
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . > X . . . X
+X . . . X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['forward', 'right']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['left', 'right', 'backward']
+Correct: True
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(3)), 0, 2)
+
+================================================================================
+
+STEP 15
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . . X . . . X
+X . . v X . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward', 'right']
+Correct: False
+Hit wall: False
+Hit obstacle: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Terminated: False
+Truncated: True
+Early stopped: True
+Early stop repeat key: ((np.int64(6), np.int64(3)), 1, 3)
+
+================================================================================
+
