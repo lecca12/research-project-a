@@ -1,4 +1,5 @@
 import json
+import re
 from pathlib import Path
 from collections import defaultdict
 
@@ -44,12 +45,91 @@ def parse_action(text, mode, env):
     raise ValueError(f"Unknown mode: {mode}")
 
 
+def extract_final_action_word(text, mode):
+    if text is None:
+        return None
+
+    valid_words = ABSOLUTE_ACTIONS if mode == "allocentric" else RELATIVE_ACTIONS
+    lowered = text.strip().lower()
+
+    patterns = [
+        r"final action\s*:\s*([a-z]+)",
+        r"final answer\s*:\s*([a-z]+)",
+        r"answer\s*:\s*([a-z]+)",
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, lowered)
+        if match:
+            word = normalize_answer(match.group(1))
+            if word in valid_words:
+                return word
+
+    words = re.findall(r"[a-z]+", lowered)
+    for word in reversed(words):
+        if word in valid_words:
+            return word
+
+    return None
+
+
+def parse_reasoning_action(text, mode, env):
+    word = extract_final_action_word(text, mode)
+
+    if word is None:
+        return None
+
+    if mode == "allocentric":
+        return ABSOLUTE_ACTIONS.get(word)
+
+    if mode == "egocentric":
+        rel_action = RELATIVE_ACTIONS.get(word)
+        if rel_action is None:
+            return None
+        return env.relative_to_cardinal(rel_action)
+
+    raise ValueError(f"Unknown mode: {mode}")
+
+
 def get_prompt(env, mode):
     if mode == "allocentric":
         return env.make_allocentric_description()
     if mode == "egocentric":
         return env.make_egocentric_description()
     raise ValueError(f"Unknown mode: {mode}")
+
+
+def make_reasoning_prompt(base_prompt, mode):
+    if mode == "allocentric":
+        action_list = ["north", "east", "south", "west"]
+        final_options = "north, east, south, or west"
+    else:
+        action_list = ["forward", "right", "backward", "left"]
+        final_options = "forward, right, backward, or left"
+
+    candidate_lines = "\n".join(
+        f"- {action}: resulting cell = ?, legal/illegal = ?, shortest-path progress = ?"
+        for action in action_list
+    )
+
+    return f"""{base_prompt}
+
+Now use candidate-evaluation reasoning before choosing.
+
+Evaluate every candidate action explicitly:
+
+{candidate_lines}
+
+For each action:
+1. Work out the resulting cell.
+2. State whether the action is legal or illegal.
+3. State whether it appears to move along a shortest valid path toward the goal.
+
+Then choose the best legal action.
+
+After the reasoning, give your final answer on a new line using exactly this format:
+Final action: <one of {final_options}>
+"""
 
 
 def classify_error(parse_failure, hit_wall, hit_obstacle, is_correct):
@@ -78,7 +158,6 @@ def get_legal_cardinal_actions(env):
 
 
 def cardinal_to_relative(action, facing):
-    # Facing convention: 0=east, 1=south, 2=west, 3=north
     facing_to_cardinal = {0: 1, 1: 2, 2: 3, 3: 0}
     cardinal_facing = facing_to_cardinal[facing]
     return (action - cardinal_facing) % 4
@@ -101,13 +180,8 @@ def legal_action_names(env, mode):
     return names
 
 
-def make_legality_reprompt(original_prompt, raw_answer, legal_names, mode):
+def make_legality_reprompt(original_prompt, raw_answer, legal_names):
     legal_text = ", ".join(legal_names)
-
-    if mode == "allocentric":
-        answer_line = f"Answer with one word only from: {legal_text}"
-    else:
-        answer_line = f"Answer with one word only from: {legal_text}"
 
     return f"""{original_prompt}
 
@@ -120,16 +194,11 @@ Choose a legal action instead.
 Legal actions available now:
 {legal_text}
 
-{answer_line}
+Answer with one word only from: {legal_text}
 """
 
 
 def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
-    """
-    Returns:
-        parsed_action, action_metadata
-    """
-
     if policy_type == "baseline":
         raw_answer = policy_fn(prompt)
         parsed_action = parse_action(raw_answer, mode, env)
@@ -140,6 +209,24 @@ def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
             "all_raw_answers": [raw_answer],
             "shield_used": False,
             "shield_reprompts": 0,
+            "reasoning_used": False,
+            "reasoning_prompt": None,
+            "legal_action_names": legal_action_names(env, mode),
+        }
+
+    if policy_type == "reasoning":
+        reasoning_prompt = make_reasoning_prompt(prompt, mode)
+        raw_answer = policy_fn(reasoning_prompt)
+        parsed_action = parse_reasoning_action(raw_answer, mode, env)
+
+        return parsed_action, {
+            "policy_type": policy_type,
+            "raw_model_answer": raw_answer,
+            "all_raw_answers": [raw_answer],
+            "shield_used": False,
+            "shield_reprompts": 0,
+            "reasoning_used": True,
+            "reasoning_prompt": reasoning_prompt,
             "legal_action_names": legal_action_names(env, mode),
         }
 
@@ -163,6 +250,8 @@ def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
                     "all_raw_answers": all_raw_answers,
                     "shield_used": attempt > 0,
                     "shield_reprompts": attempt,
+                    "reasoning_used": False,
+                    "reasoning_prompt": None,
                     "legal_action_names": legal_names,
                 }
 
@@ -170,7 +259,6 @@ def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
                 original_prompt=prompt,
                 raw_answer=raw_answer,
                 legal_names=legal_names,
-                mode=mode,
             )
 
         return parsed_action, {
@@ -179,6 +267,8 @@ def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
             "all_raw_answers": all_raw_answers,
             "shield_used": True,
             "shield_reprompts": max_reprompts,
+            "reasoning_used": False,
+            "reasoning_prompt": None,
             "legal_action_names": legal_names,
         }
 
@@ -285,6 +375,8 @@ def run_episode(
                 "legal_action_names": action_meta["legal_action_names"],
                 "shield_used": action_meta["shield_used"],
                 "shield_reprompts": action_meta["shield_reprompts"],
+                "reasoning_used": action_meta["reasoning_used"],
+                "reasoning_prompt": action_meta["reasoning_prompt"],
                 "is_valid_format": False,
                 "is_correct": False,
                 "parse_failure": True,
@@ -337,6 +429,8 @@ def run_episode(
             "legal_action_names": action_meta["legal_action_names"],
             "shield_used": action_meta["shield_used"],
             "shield_reprompts": action_meta["shield_reprompts"],
+            "reasoning_used": action_meta["reasoning_used"],
+            "reasoning_prompt": action_meta["reasoning_prompt"],
             "is_valid_format": True,
             "is_correct": is_correct,
             "parse_failure": False,
@@ -361,13 +455,13 @@ def run_episode(
             print(f"Policy={policy_type}, mode={mode}, step={step}")
             print(grid_text)
             print("Raw answer:", raw_answer)
-            print("All raw answers:", action_meta["all_raw_answers"])
             print("Parsed:", parsed_action, info["action_name"])
             print("Legal actions:", action_meta["legal_action_names"])
             print("Optimal allocentric:", optimal_action_names)
             print("Optimal egocentric:", optimal_relative_action_names)
             print("Correct:", is_correct)
             print("Error:", error_type)
+            print("Reasoning used:", action_meta["reasoning_used"])
             print("Shield used:", action_meta["shield_used"])
             print("Early stop:", stop_now)
 
@@ -410,8 +504,7 @@ def main():
     start_seed = 0
     modes = ["allocentric", "egocentric"]
 
-    # Start with baseline only. Later change to:
-    policy_types = ["baseline", "legality_shield"]
+    policy_types = ["baseline", "legality_shield", "reasoning"]
 
     early_stop_repeats = 3
 
@@ -420,7 +513,7 @@ def main():
 
     model = "gpt-4o-mini"
     temperature = 0.0
-    max_output_tokens = 16
+    max_output_tokens = 256 if "reasoning" in policy_types else 16
 
     output_path = Path("custom_minigrid_results.json")
     metadata_path = Path("custom_minigrid_results_metadata.json")
@@ -436,6 +529,7 @@ def main():
     print("Early stop repeats:", early_stop_repeats)
     print("Preview only:", preview_only)
     print("Print generated grids:", print_generated_grids)
+    print("Max output tokens:", max_output_tokens)
 
     if not preview_only:
         policy_fn = make_openai_policy_fn(
