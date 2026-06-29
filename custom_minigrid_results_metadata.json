@@ -25,7 +25,8 @@
   ],
   "policy_types": [
     "baseline",
-    "legality_shield"
+    "legality_shield",
+    "reasoning"
   ],
   "early_stop_repeats": 3,
   "preview_only": false,
@@ -33,6 +34,6 @@
   "max_steps_rule": "grid_size_squared",
   "model": "gpt-4o-mini",
   "temperature": 0.0,
-  "max_output_tokens": 16,
+  "max_output_tokens": 256,
   "output_file": "custom_minigrid_results.json"
 }
