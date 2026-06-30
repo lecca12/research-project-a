@@ -21,6 +21,13 @@ LABEL_MAP = {
     "no_first_error": "No first error",
 }
 
+POLICY_ORDER = ["baseline", "legality_shield", "reasoning"]
+POLICY_LABEL = {
+    "baseline": "Baseline",
+    "legality_shield": "Shield",
+    "reasoning": "Reasoning",
+}
+
 
 def load_results(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -59,11 +66,7 @@ def summarize(results):
     })
 
     for ep in results:
-        key = (
-            ep.get("policy_type", "baseline"),
-            ep["mode"],
-        )
-
+        key = (ep.get("policy_type", "baseline"), ep["mode"])
         summary[key]["episodes"] += 1
 
         if ep.get("reached_goal", False):
@@ -75,25 +78,27 @@ def summarize(results):
     return summary
 
 
+def available_policies(summary):
+    policies = {policy for policy, _ in summary.keys()}
+    return [p for p in POLICY_ORDER if p in policies]
+
+
 def plot_success(summary, title, output_path):
-    categories = [
-        ("baseline", "allocentric", "Baseline\nAllocentric"),
-        ("baseline", "egocentric", "Baseline\nEgocentric"),
-        ("legality_shield", "allocentric", "Shield\nAllocentric"),
-        ("legality_shield", "egocentric", "Shield\nEgocentric"),
-    ]
+    policies = available_policies(summary)
+    categories = []
+
+    for policy in policies:
+        categories.append((policy, "allocentric", f"{POLICY_LABEL[policy]}\nAllocentric"))
+        categories.append((policy, "egocentric", f"{POLICY_LABEL[policy]}\nEgocentric"))
 
     labels = [label for _, _, label in categories]
     values = []
 
     for policy, mode, _ in categories:
         data = summary.get((policy, mode))
-        if data is None:
-            values.append(0.0)
-        else:
-            values.append(100 * safe_div(data["successes"], data["episodes"]))
+        values.append(100 * safe_div(data["successes"], data["episodes"]) if data else 0.0)
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(10, 5))
     ax.bar(labels, values)
 
     ax.set_title(title)
@@ -102,7 +107,7 @@ def plot_success(summary, title, output_path):
     ax.grid(axis="y", alpha=0.3)
 
     for i, value in enumerate(values):
-        ax.text(i, value + 2, f"{value:.1f}%", ha="center", va="bottom")
+        ax.text(i, min(value + 2, 98), f"{value:.1f}%", ha="center", va="bottom")
 
     fig.tight_layout()
     fig.savefig(output_path, dpi=300)
@@ -110,25 +115,24 @@ def plot_success(summary, title, output_path):
 
 
 def plot_first_events(summary, title, output_path):
-    categories = [
-        ("baseline", "allocentric", "Baseline\nAllocentric"),
-        ("baseline", "egocentric", "Baseline\nEgocentric"),
-        ("legality_shield", "allocentric", "Shield\nAllocentric"),
-        ("legality_shield", "egocentric", "Shield\nEgocentric"),
-    ]
+    policies = available_policies(summary)
+    categories = []
+
+    for policy in policies:
+        categories.append((policy, "allocentric", f"{POLICY_LABEL[policy]}\nAllocentric"))
+        categories.append((policy, "egocentric", f"{POLICY_LABEL[policy]}\nEgocentric"))
 
     labels = [label for _, _, label in categories]
     x = list(range(len(labels)))
     bottoms = [0.0 for _ in labels]
 
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(11, 5))
 
     for event in EVENT_ORDER:
         values = []
 
         for policy, mode, _ in categories:
             data = summary.get((policy, mode))
-
             if data is None:
                 values.append(0.0)
                 continue
@@ -166,40 +170,43 @@ def main():
     output_dir.mkdir(exist_ok=True)
 
     custom_results = load_results("custom_minigrid_results.json")
-    simple_results = load_results("minigrid_results.json")
-
     custom_summary = summarize(custom_results)
-    simple_summary = summarize(simple_results)
 
     plot_success(
         custom_summary,
         "Custom MiniGrid Success Rates",
-        output_dir / "custom_minigrid_success_rates.png",
+        output_dir / "custom_minigrid_success_rates_with_reasoning.png",
     )
 
     plot_first_events(
         custom_summary,
         "Custom MiniGrid First-Event Outcomes",
-        output_dir / "custom_minigrid_first_events.png",
+        output_dir / "custom_minigrid_first_events_with_reasoning.png",
     )
 
-    plot_success(
-        simple_summary,
-        "SimpleCrossing Success Rates",
-        output_dir / "simplecrossing_success_rates.png",
-    )
+    try:
+        simple_results = load_results("minigrid_results.json")
+        simple_summary = summarize(simple_results)
 
-    plot_first_events(
-        simple_summary,
-        "SimpleCrossing First-Event Outcomes",
-        output_dir / "simplecrossing_first_events.png",
-    )
+        plot_success(
+            simple_summary,
+            "SimpleCrossing Success Rates",
+            output_dir / "simplecrossing_success_rates.png",
+        )
+
+        plot_first_events(
+            simple_summary,
+            "SimpleCrossing First-Event Outcomes",
+            output_dir / "simplecrossing_first_events.png",
+        )
+    except FileNotFoundError:
+        print("minigrid_results.json not found; skipped SimpleCrossing plots.")
 
     print("Saved plots to:", output_dir)
-    print("- custom_minigrid_success_rates.png")
-    print("- custom_minigrid_first_events.png")
-    print("- simplecrossing_success_rates.png")
-    print("- simplecrossing_first_events.png")
+    print("- custom_minigrid_success_rates_with_reasoning.png")
+    print("- custom_minigrid_first_events_with_reasoning.png")
+    print("- simplecrossing_success_rates.png, if minigrid_results.json exists")
+    print("- simplecrossing_first_events.png, if minigrid_results.json exists")
 
 
 if __name__ == "__main__":
