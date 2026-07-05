@@ -75,6 +75,15 @@ class MiniGridCardinalWrapper:
     def close(self):
         self.env.close()
 
+    def _is_outer_boundary_cell(self, row, col):
+        grid = self.unwrapped.grid
+        return (
+            row == 0
+            or row == grid.height - 1
+            or col == 0
+            or col == grid.width - 1
+        )
+
     def get_state(self):
         env = self.unwrapped
         grid = env.grid
@@ -84,7 +93,8 @@ class MiniGridCardinalWrapper:
         facing = int(env.agent_dir)
 
         goal_pos = None
-        wall_cells = []
+        boundary_cells = []
+        interior_wall_cells = []
         obstacle_cells = []
 
         for y in range(grid.height):
@@ -99,7 +109,11 @@ class MiniGridCardinalWrapper:
                 if cell.type == "goal":
                     goal_pos = rc
                 elif cell.type == "wall":
-                    wall_cells.append(rc)
+                    if self._is_outer_boundary_cell(y, x):
+                        boundary_cells.append(rc)
+                    else:
+                        interior_wall_cells.append(rc)
+                        obstacle_cells.append((rc, "interior_wall"))
                 else:
                     obstacle_cells.append((rc, cell.type))
 
@@ -109,7 +123,9 @@ class MiniGridCardinalWrapper:
             "goal": goal_pos,
             "facing": facing,
             "facing_name": DIRECTION_NAMES[facing],
-            "wall_cells": wall_cells,
+            "wall_cells": boundary_cells,
+            "boundary_cells": boundary_cells,
+            "interior_wall_cells": interior_wall_cells,
             "obstacle_cells": obstacle_cells,
         }
 
@@ -117,8 +133,9 @@ class MiniGridCardinalWrapper:
         env = self.unwrapped
         grid = env.grid
 
+        # Outside the grid is a true boundary error.
         if row < 0 or row >= grid.height or col < 0 or col >= grid.width:
-            return True, "wall"
+            return True, "boundary"
 
         cell = grid.get(col, row)
 
@@ -128,7 +145,16 @@ class MiniGridCardinalWrapper:
         if cell.type == "goal":
             return False, None
 
-        return True, cell.type
+        if cell.type == "wall":
+            # Outer frame walls are boundary errors.
+            if self._is_outer_boundary_cell(row, col):
+                return True, "boundary"
+
+            # Interior walls in SimpleCrossing/FourRooms are obstacle-like.
+            return True, "obstacle"
+
+        # Lava, doors, balls, boxes, keys, etc. are obstacle-like for this task.
+        return True, "obstacle"
 
     def _is_free(self, row, col):
         blocked, _ = self.is_blocked(row, col)
@@ -252,8 +278,8 @@ class MiniGridCardinalWrapper:
 
         blocked, blocked_type = self.is_blocked(new_row, new_col)
 
-        hit_wall = blocked and blocked_type == "wall"
-        hit_obstacle = blocked and blocked_type != "wall"
+        hit_wall = blocked and blocked_type == "boundary"
+        hit_obstacle = blocked and blocked_type == "obstacle"
 
         if not blocked:
             env.agent_pos = (new_col, new_row)
@@ -325,7 +351,12 @@ class MiniGridCardinalWrapper:
                 elif cell.type == "goal":
                     row.append("G")
                 elif cell.type == "wall":
-                    row.append("X")
+                    if self._is_outer_boundary_cell(y, x):
+                        row.append("X")
+                    else:
+                        row.append("#")
+                elif cell.type == "lava":
+                    row.append("L")
                 else:
                     row.append("?")
 
@@ -341,7 +372,9 @@ class MiniGridCardinalWrapper:
 Grid size: {state["grid_size"][0]} x {state["grid_size"][1]}
 Agent position: {state["agent"]}
 Goal position: {state["goal"]}
-Wall cells: {state["wall_cells"]}
+Boundary wall cells: {state["boundary_cells"]}
+Interior wall/obstacle cells: {state["interior_wall_cells"]}
+Other obstacle cells: {state["obstacle_cells"]}
 
 Coordinate system:
 - Row 0 is the top (north), and row numbers increase downward (south).
@@ -351,8 +384,8 @@ Choose exactly one action from:
 north, east, south, west
 
 Rules:
-- Do not move into a wall or blocked cell.
-- Do not move outside the grid.
+- Do not move into an interior wall or obstacle.
+- Do not move outside the grid or into the outer boundary.
 - Choose the best next move on a shortest valid path to the goal.
 
 Answer with one word only:
@@ -367,7 +400,9 @@ north, east, south, or west
 Grid size: {state["grid_size"][0]} x {state["grid_size"][1]}
 Agent position: {state["agent"]}
 Goal position: {state["goal"]}
-Wall cells: {state["wall_cells"]}
+Boundary wall cells: {state["boundary_cells"]}
+Interior wall/obstacle cells: {state["interior_wall_cells"]}
+Other obstacle cells: {state["obstacle_cells"]}
 
 The agent is currently facing {state["facing_name"]}.
 
@@ -381,8 +416,8 @@ Choose exactly one action from:
 forward, right, backward, left
 
 Rules:
-- Do not move into a wall or blocked cell.
-- Do not move outside the grid.
+- Do not move into an interior wall or obstacle.
+- Do not move outside the grid or into the outer boundary.
 - Choose the best next move on a shortest valid path to the goal.
 
 Answer with one word only:
@@ -392,7 +427,7 @@ forward, right, backward, or left
 
 def main():
     wrapper = MiniGridCardinalWrapper(
-        env_name="MiniGrid-Empty-8x8-v0",
+        env_name="MiniGrid-SimpleCrossingS9N1-v0",
         seed=0,
     )
 
@@ -401,6 +436,10 @@ def main():
     print("\nFULL GRID")
     print("=" * 60)
     print(wrapper.render_text())
+
+    print("\nSTATE")
+    print("=" * 60)
+    print(wrapper.get_state())
 
     print("\nOPTIMAL ACTIONS")
     print("=" * 60)
@@ -414,20 +453,6 @@ def main():
     print("\nEGOCENTRIC DESCRIPTION")
     print("=" * 60)
     print(wrapper.make_egocentric_description())
-
-    print("\nTEST CARDINAL STEP")
-    print("=" * 60)
-    state, reward, terminated, truncated, info = wrapper.step_cardinal(1)
-    print("Action: east")
-    print("Reward:", reward)
-    print("Terminated:", terminated)
-    print("Info:", info)
-    print(wrapper.render_text())
-
-    print("\nOPTIMAL ACTIONS AFTER STEP")
-    print("=" * 60)
-    print("Optimal allocentric actions:", wrapper.get_optimal_action_names())
-    print("Optimal egocentric actions:", wrapper.get_optimal_relative_action_names())
 
     wrapper.close()
 
