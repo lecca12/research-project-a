@@ -52,9 +52,9 @@ def extract_final_action_word(text, mode):
     lowered = text.strip().lower()
 
     patterns = [
+        r"answer\s*:\s*([a-z]+)",
         r"final action\s*:\s*([a-z]+)",
         r"final answer\s*:\s*([a-z]+)",
-        r"answer\s*:\s*([a-z]+)",
     ]
 
     for pattern in patterns:
@@ -125,7 +125,7 @@ For each action:
 Then choose the best legal action.
 
 After the reasoning, give your final answer on a new line using exactly this format:
-Final action: <one of {final_options}>
+Answer: <one of {final_options}>
 """
 
 
@@ -155,8 +155,6 @@ def get_legal_cardinal_actions(env):
 
 
 def cardinal_to_relative(action, facing):
-    # MiniGrid facing: 0=east, 1=south, 2=west, 3=north
-    # Project cardinal: 0=north, 1=east, 2=south, 3=west
     facing_to_cardinal = {0: 1, 1: 2, 2: 3, 3: 0}
     cardinal_facing = facing_to_cardinal[facing]
     return (action - cardinal_facing) % 4
@@ -334,7 +332,7 @@ def save_episode_trace(result, output_dir="farama_minigrid_traces"):
             f.write(f"Optimal relative actions: {step.get('optimal_relative_action_names')}\n")
             f.write(f"Legal actions: {step.get('legal_action_names')}\n")
             f.write(f"Correct: {step.get('is_correct')}\n")
-            f.write(f"Hit wall/boundary: {step.get('hit_wall')}\n")
+            f.write(f"Hit boundary: {step.get('hit_wall')}\n")
             f.write(f"Hit obstacle/interior wall: {step.get('hit_obstacle')}\n")
             f.write(f"Blocked type: {step.get('blocked_type')}\n")
             f.write(f"Error type: {step.get('error_type')}\n")
@@ -547,21 +545,24 @@ def main():
     save_traces = True
 
     model = "gpt-4o-mini"
-    temperature = 0.0
+    short_temperature = 0.0
+    reasoning_temperature = None
+    short_max_output_tokens = 16
+    reasoning_max_output_tokens = 1500
 
     output_path = Path("farama_minigrid_results.json")
     metadata_path = Path("farama_minigrid_results_metadata.json")
 
     short_policy_fn = make_openai_policy_fn(
         model=model,
-        temperature=temperature,
-        max_output_tokens=16,
+        temperature=short_temperature,
+        max_output_tokens=short_max_output_tokens,
     )
 
     reasoning_policy_fn = make_openai_policy_fn(
         model=model,
-        temperature=temperature,
-        max_output_tokens=256,
+        temperature=reasoning_temperature,
+        max_output_tokens=reasoning_max_output_tokens,
     )
 
     all_results = []
@@ -574,6 +575,8 @@ def main():
     print("Policy types:", policy_types)
     print("Early stop repeats:", early_stop_repeats)
     print("Save traces:", save_traces)
+    print("Short max output tokens:", short_max_output_tokens)
+    print("Reasoning max output tokens:", reasoning_max_output_tokens)
 
     for env_name in env_names:
         max_steps = max_steps_by_env[env_name]
@@ -603,9 +606,10 @@ def main():
                     )
 
                     result["model"] = model
-                    result["temperature"] = temperature
-                    result["short_max_output_tokens"] = 16
-                    result["reasoning_max_output_tokens"] = 256
+                    result["short_temperature"] = short_temperature
+                    result["reasoning_temperature"] = reasoning_temperature
+                    result["short_max_output_tokens"] = short_max_output_tokens
+                    result["reasoning_max_output_tokens"] = reasoning_max_output_tokens
 
                     all_results.append(result)
 
@@ -633,9 +637,10 @@ def main():
         "save_traces": save_traces,
         "max_steps_rule": "environment_specific_grid_size_squared",
         "model": model,
-        "temperature": temperature,
-        "short_max_output_tokens": 16,
-        "reasoning_max_output_tokens": 256,
+        "short_temperature": short_temperature,
+        "reasoning_temperature": reasoning_temperature,
+        "short_max_output_tokens": short_max_output_tokens,
+        "reasoning_max_output_tokens": reasoning_max_output_tokens,
         "output_file": str(output_path),
     }
 
