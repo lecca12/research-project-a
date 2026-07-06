@@ -53,9 +53,9 @@ def extract_final_action_word(text, mode):
     lowered = text.strip().lower()
 
     patterns = [
+        r"answer\s*:\s*([a-z]+)",
         r"final action\s*:\s*([a-z]+)",
         r"final answer\s*:\s*([a-z]+)",
-        r"answer\s*:\s*([a-z]+)",
     ]
 
     for pattern in patterns:
@@ -128,7 +128,7 @@ For each action:
 Then choose the best legal action.
 
 After the reasoning, give your final answer on a new line using exactly this format:
-Final action: <one of {final_options}>
+Answer: <one of {final_options}>
 """
 
 
@@ -198,9 +198,17 @@ Answer with one word only from: {legal_text}
 """
 
 
-def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
+def choose_action(
+    env,
+    mode,
+    policy_type,
+    prompt,
+    short_policy_fn,
+    reasoning_policy_fn,
+    max_reprompts=2,
+):
     if policy_type == "baseline":
-        raw_answer = policy_fn(prompt)
+        raw_answer = short_policy_fn(prompt)
         parsed_action = parse_action(raw_answer, mode, env)
 
         return parsed_action, {
@@ -216,7 +224,7 @@ def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
 
     if policy_type == "reasoning":
         reasoning_prompt = make_reasoning_prompt(prompt, mode)
-        raw_answer = policy_fn(reasoning_prompt)
+        raw_answer = reasoning_policy_fn(reasoning_prompt)
         parsed_action = parse_reasoning_action(raw_answer, mode, env)
 
         return parsed_action, {
@@ -238,7 +246,7 @@ def choose_action(env, mode, policy_fn, policy_type, prompt, max_reprompts=2):
         current_prompt = prompt
 
         for attempt in range(max_reprompts + 1):
-            raw_answer = policy_fn(current_prompt)
+            raw_answer = short_policy_fn(current_prompt)
             all_raw_answers.append(raw_answer)
 
             parsed_action = parse_action(raw_answer, mode, env)
@@ -320,7 +328,8 @@ def print_generated_states(fixed_states):
 def run_episode(
     fixed_state,
     mode,
-    policy_fn,
+    short_policy_fn,
+    reasoning_policy_fn,
     max_steps,
     policy_type="baseline",
     early_stop_repeats=3,
@@ -349,9 +358,10 @@ def run_episode(
         parsed_action, action_meta = choose_action(
             env=env,
             mode=mode,
-            policy_fn=policy_fn,
             policy_type=policy_type,
             prompt=prompt,
+            short_policy_fn=short_policy_fn,
+            reasoning_policy_fn=reasoning_policy_fn,
         )
 
         raw_answer = action_meta["raw_model_answer"]
@@ -512,8 +522,12 @@ def main():
     print_generated_grids = True
 
     model = "gpt-4o-mini"
-    temperature = 0.0
-    max_output_tokens = 256 if "reasoning" in policy_types else 16
+
+    short_temperature = 0.0
+    reasoning_temperature = None
+
+    short_max_output_tokens = 16
+    reasoning_max_output_tokens = 1500
 
     output_path = Path("custom_minigrid_results.json")
     metadata_path = Path("custom_minigrid_results_metadata.json")
@@ -529,16 +543,24 @@ def main():
     print("Early stop repeats:", early_stop_repeats)
     print("Preview only:", preview_only)
     print("Print generated grids:", print_generated_grids)
-    print("Max output tokens:", max_output_tokens)
+    print("Short max output tokens:", short_max_output_tokens)
+    print("Reasoning max output tokens:", reasoning_max_output_tokens)
 
     if not preview_only:
-        policy_fn = make_openai_policy_fn(
+        short_policy_fn = make_openai_policy_fn(
             model=model,
-            temperature=temperature,
-            max_output_tokens=max_output_tokens,
+            temperature=short_temperature,
+            max_output_tokens=short_max_output_tokens,
+        )
+
+        reasoning_policy_fn = make_openai_policy_fn(
+            model=model,
+            temperature=reasoning_temperature,
+            max_output_tokens=reasoning_max_output_tokens,
         )
     else:
-        policy_fn = None
+        short_policy_fn = None
+        reasoning_policy_fn = None
 
     for condition in conditions:
         size = condition["size"]
@@ -573,7 +595,8 @@ def main():
                     result = run_episode(
                         fixed_state=state,
                         mode=mode,
-                        policy_fn=policy_fn,
+                        short_policy_fn=short_policy_fn,
+                        reasoning_policy_fn=reasoning_policy_fn,
                         max_steps=max_steps,
                         policy_type=policy_type,
                         early_stop_repeats=early_stop_repeats,
@@ -581,8 +604,10 @@ def main():
                     )
 
                     result["model"] = model
-                    result["temperature"] = temperature
-                    result["max_output_tokens"] = max_output_tokens
+                    result["short_temperature"] = short_temperature
+                    result["reasoning_temperature"] = reasoning_temperature
+                    result["short_max_output_tokens"] = short_max_output_tokens
+                    result["reasoning_max_output_tokens"] = reasoning_max_output_tokens
 
                     all_results.append(result)
 
@@ -611,8 +636,10 @@ def main():
         "print_generated_grids": print_generated_grids,
         "max_steps_rule": "grid_size_squared",
         "model": model,
-        "temperature": temperature,
-        "max_output_tokens": max_output_tokens,
+        "short_temperature": short_temperature,
+        "reasoning_temperature": reasoning_temperature,
+        "short_max_output_tokens": short_max_output_tokens,
+        "reasoning_max_output_tokens": reasoning_max_output_tokens,
         "output_file": str(output_path),
     }
 
