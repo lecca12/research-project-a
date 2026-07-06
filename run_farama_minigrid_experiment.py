@@ -534,11 +534,7 @@ def main():
     seeds = list(range(10))
     modes = ["allocentric", "egocentric"]
 
-    # Use this for a quick meeting run:
-    policy_types = ["baseline"]
-
-    # Later, switch to:
-    # policy_types = ["baseline", "legality_shield", "reasoning"]
+    policy_types = ["baseline", "legality_shield", "reasoning"]
 
     max_steps_by_env = {
         "MiniGrid-SimpleCrossingS9N1-v0": 9 ** 2,
