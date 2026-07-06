@@ -17,16 +17,18 @@ class OpenAIPolicyError(RuntimeError):
 
 def make_openai_policy_fn(
     model: str = "gpt-4o-mini",
-    temperature: float = 0.0,
+    temperature: float | None = 0.0,
     api_key: str | None = None,
     system_instructions: str = DEFAULT_SYSTEM_INSTRUCTIONS,
     max_output_tokens: int = 16,
 ) -> Callable[[str], str]:
     """
-    Returns a function: policy_fn(prompt) -> model response text
+    Returns a function: policy_fn(prompt) -> model response text.
+
+    If temperature is None, the temperature parameter is omitted from the API call.
+    This is useful for reasoning/newer models that reject or ignore custom temperature.
     """
 
-    # Resolve API key
     resolved_key = api_key or os.environ.get("OPENAI_API_KEY")
     if not resolved_key:
         raise OpenAIPolicyError(
@@ -37,16 +39,19 @@ def make_openai_policy_fn(
 
     def policy_fn(prompt: str) -> str:
         try:
-            # Avoid hitting rate limits
             time.sleep(0.3)
 
-            response = client.responses.create(
-                model=model,
-                instructions=system_instructions,
-                input=prompt,
-                temperature=temperature,
-                max_output_tokens=max_output_tokens,
-            )
+            request_kwargs = {
+                "model": model,
+                "instructions": system_instructions,
+                "input": prompt,
+                "max_output_tokens": max_output_tokens,
+            }
+
+            if temperature is not None:
+                request_kwargs["temperature"] = temperature
+
+            response = client.responses.create(**request_kwargs)
 
         except Exception as exc:
             raise OpenAIPolicyError(f"OpenAI API call failed: {exc}") from exc
