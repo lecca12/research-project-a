@@ -1,0 +1,317 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: baseline
+Mode: egocentric
+Seed: 4
+Reached goal: False
+Early stopped: True
+Steps: 7
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . G v # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: left
+All raw answers: ['left']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['west']
+Optimal relative actions: ['right']
+Legal actions: ['backward', 'forward', 'right']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(11), np.int64(8)), 1, 1)
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . G > # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: left
+All raw answers: ['left']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['west']
+Optimal relative actions: ['backward']
+Legal actions: ['left', 'right', 'backward']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(11), np.int64(8)), 0, 0)
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . . ^ # . . . . . . . . X
+X . . . . . . G . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: left
+All raw answers: ['left']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south', 'west']
+Optimal relative actions: ['backward', 'left']
+Legal actions: ['forward', 'backward', 'left']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(10), np.int64(8)), 3, 3)
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . < . # . . . . . . . . X
+X . . . . . . G . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['south']
+Optimal relative actions: ['left']
+Legal actions: ['backward', 'left', 'forward']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(10), np.int64(7)), 2, 0)
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . ^ . # . . . . . . . . X
+X . . . . . . G . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['south']
+Optimal relative actions: ['backward']
+Legal actions: ['right', 'backward', 'left']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(10), np.int64(7)), 3, 0)
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . ^ . # . . . . . . . . X
+X . . . . . . G . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['south']
+Optimal relative actions: ['backward']
+Legal actions: ['right', 'backward', 'left']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(10), np.int64(7)), 3, 0)
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . ^ . # . . . . . . . . X
+X . . . . . . G . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['south']
+Optimal relative actions: ['backward']
+Legal actions: ['right', 'backward', 'left']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Terminated: False
+Truncated: True
+Early stopped: True
+Early stop repeat key: ((np.int64(10), np.int64(7)), 3, 0)
+
+================================================================================
+

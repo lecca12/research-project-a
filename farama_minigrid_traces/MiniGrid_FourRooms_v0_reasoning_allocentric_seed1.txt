@@ -1,0 +1,211 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: reasoning
+Mode: allocentric
+Seed: 1
+Reached goal: True
+Early stopped: False
+Steps: 4
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . ^ . . . G # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # . # # # # # # # # # # . # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - north: resulting cell = (4, 4), legal/illegal = legal, shortest-path progress = moves away from goal
+- east: resulting cell = (5, 5), legal/illegal = legal, shortest-path progress = moves closer to goal
+- south: resulting cell = (6, 4), legal/illegal = legal, shortest-path progress = moves away from goal
+- west: resulting cell = (5, 3), legal/illegal = legal, shortest-path progress = moves away from goal
+
+The best action is east because it is legal and brings the agent closer to the goal.
+
+Answer: east
+All raw answers: ['- north: resulting cell = (4, 4), legal/illegal = legal, shortest-path progress = moves away from goal\n- east: resulting cell = (5, 5), legal/illegal = legal, shortest-path progress = moves closer to goal\n- south: resulting cell = (6, 4), legal/illegal = legal, shortest-path progress = moves away from goal\n- west: resulting cell = (5, 3), legal/illegal = legal, shortest-path progress = moves away from goal\n\nThe best action is east because it is legal and brings the agent closer to the goal.\n\nAnswer: east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['right']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(4)), 3, 1)
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . > . . G # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # . # # # # # # # # # # . # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - north: resulting cell = (4, 5), legal/illegal = legal, shortest-path progress = yes
+- east: resulting cell = (5, 6), legal/illegal = legal, shortest-path progress = yes
+- south: resulting cell = (6, 5), legal/illegal = legal, shortest-path progress = no
+- west: resulting cell = (5, 4), legal/illegal = legal, shortest-path progress = no
+
+Answer: east
+All raw answers: ['- north: resulting cell = (4, 5), legal/illegal = legal, shortest-path progress = yes\n- east: resulting cell = (5, 6), legal/illegal = legal, shortest-path progress = yes\n- south: resulting cell = (6, 5), legal/illegal = legal, shortest-path progress = no\n- west: resulting cell = (5, 4), legal/illegal = legal, shortest-path progress = no\n\nAnswer: east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(5)), 0, 1)
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . > . G # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # . # # # # # # # # # # . # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - north: resulting cell = (4, 6), legal/illegal = legal, shortest-path progress = towards the goal
+- east: resulting cell = (5, 7), legal/illegal = legal, shortest-path progress = towards the goal
+- south: resulting cell = (6, 6), legal/illegal = legal, shortest-path progress = not toward the goal
+- west: resulting cell = (5, 5), legal/illegal = legal, shortest-path progress = not toward the goal
+
+The best action that moves toward the goal is to go east.
+
+Answer: east
+All raw answers: ['- north: resulting cell = (4, 6), legal/illegal = legal, shortest-path progress = towards the goal\n- east: resulting cell = (5, 7), legal/illegal = legal, shortest-path progress = towards the goal\n- south: resulting cell = (6, 6), legal/illegal = legal, shortest-path progress = not toward the goal\n- west: resulting cell = (5, 5), legal/illegal = legal, shortest-path progress = not toward the goal\n\nThe best action that moves toward the goal is to go east.\n\nAnswer: east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(6)), 0, 1)
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . > G # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # . # # # # # # # # # # . # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - north: resulting cell = (4, 7), legal/illegal = legal, shortest-path progress = 1 step closer to goal (4, 8).
+- east: resulting cell = (5, 8), legal/illegal = legal, shortest-path progress = goal reached.
+- south: resulting cell = (6, 7), legal/illegal = legal, shortest-path progress = no progress towards goal.
+- west: resulting cell = (5, 6), legal/illegal = legal, shortest-path progress = no progress towards goal.
+
+The best action is east, as it directly reaches the goal position.
+
+Answer: east
+All raw answers: ['- north: resulting cell = (4, 7), legal/illegal = legal, shortest-path progress = 1 step closer to goal (4, 8).\n- east: resulting cell = (5, 8), legal/illegal = legal, shortest-path progress = goal reached.\n- south: resulting cell = (6, 7), legal/illegal = legal, shortest-path progress = no progress towards goal.\n- west: resulting cell = (5, 6), legal/illegal = legal, shortest-path progress = no progress towards goal.\n\nThe best action is east, as it directly reaches the goal position.\n\nAnswer: east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: True
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(5), np.int64(7)), 0, 1)
+
+================================================================================
+

@@ -1,0 +1,211 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: reasoning
+Mode: egocentric
+Seed: 9
+Reached goal: False
+Early stopped: True
+Steps: 4
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # . # # # # # # # # # . X
+X . . . . . . . . # . . . . . . . . X
+X . < . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . G . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - forward: resulting cell = (11, 1), legal/illegal = legal, shortest-path progress = does not make progress towards goal
+- right: resulting cell = (12, 2), legal/illegal = legal, shortest-path progress = makes progress towards goal
+- backward: resulting cell = (11, 3), legal/illegal = illegal, shortest-path progress = not applicable
+- left: resulting cell = (10, 2), legal/illegal = legal, shortest-path progress = does not make progress towards goal
+
+The best legal action that makes progress towards the goal is "right".
+
+Answer: right
+All raw answers: ['- forward: resulting cell = (11, 1), legal/illegal = legal, shortest-path progress = does not make progress towards goal\n- right: resulting cell = (12, 2), legal/illegal = legal, shortest-path progress = makes progress towards goal\n- backward: resulting cell = (11, 3), legal/illegal = illegal, shortest-path progress = not applicable\n- left: resulting cell = (10, 2), legal/illegal = legal, shortest-path progress = does not make progress towards goal\n\nThe best legal action that makes progress towards the goal is "right".\n\nAnswer: right']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['backward', 'left']
+Legal actions: ['right', 'backward', 'left', 'forward']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(11), np.int64(2)), 2, 0)
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # . # # # # # # # # # . X
+X . ^ . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . G . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - forward: resulting cell = (10, 1), legal/illegal = legal, shortest-path progress = yes
+- right: resulting cell = (11, 2), legal/illegal = legal, shortest-path progress = yes
+- backward: resulting cell = (10, 3), legal/illegal = illegal, shortest-path progress = no
+- left: resulting cell = (9, 2), legal/illegal = illegal, shortest-path progress = no
+
+The best legal action that progresses along the shortest path to the goal is:
+
+Answer: forward
+All raw answers: ['- forward: resulting cell = (10, 1), legal/illegal = legal, shortest-path progress = yes\n- right: resulting cell = (11, 2), legal/illegal = legal, shortest-path progress = yes\n- backward: resulting cell = (10, 3), legal/illegal = illegal, shortest-path progress = no\n- left: resulting cell = (9, 2), legal/illegal = illegal, shortest-path progress = no\n\nThe best legal action that progresses along the shortest path to the goal is:\n\nAnswer: forward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['right', 'backward']
+Legal actions: ['right', 'backward', 'left']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(10), np.int64(2)), 3, 0)
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # . # # # # # # # # # . X
+X . ^ . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . G . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - forward: resulting cell = (10, 1), legal/illegal = legal, shortest-path progress = yes
+- right: resulting cell = (11, 2), legal/illegal = legal, shortest-path progress = yes
+- backward: resulting cell = (10, 3), legal/illegal = illegal, shortest-path progress = no
+- left: resulting cell = (9, 2), legal/illegal = illegal, shortest-path progress = no
+
+The best legal action is either "forward" or "right," both of which make progress toward the goal, but "forward" keeps the agent moving toward cells with a clear path.
+
+Answer: forward
+All raw answers: ['- forward: resulting cell = (10, 1), legal/illegal = legal, shortest-path progress = yes\n- right: resulting cell = (11, 2), legal/illegal = legal, shortest-path progress = yes\n- backward: resulting cell = (10, 3), legal/illegal = illegal, shortest-path progress = no\n- left: resulting cell = (9, 2), legal/illegal = illegal, shortest-path progress = no\n\nThe best legal action is either "forward" or "right," both of which make progress toward the goal, but "forward" keeps the agent moving toward cells with a clear path.\n\nAnswer: forward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['right', 'backward']
+Legal actions: ['right', 'backward', 'left']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(10), np.int64(2)), 3, 0)
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # . # # # # # # # # # . X
+X . ^ . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . G . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - forward: resulting cell = (10, 1), legal/illegal = legal, shortest-path progress = yes
+- right: resulting cell = (11, 2), legal/illegal = legal, shortest-path progress = yes
+- backward: resulting cell = (10, 3), legal/illegal = illegal, shortest-path progress = no
+- left: resulting cell = (9, 2), legal/illegal = illegal, shortest-path progress = no
+
+Answer: forward
+All raw answers: ['- forward: resulting cell = (10, 1), legal/illegal = legal, shortest-path progress = yes\n- right: resulting cell = (11, 2), legal/illegal = legal, shortest-path progress = yes\n- backward: resulting cell = (10, 3), legal/illegal = illegal, shortest-path progress = no\n- left: resulting cell = (9, 2), legal/illegal = illegal, shortest-path progress = no\n\nAnswer: forward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['right', 'backward']
+Legal actions: ['right', 'backward', 'left']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: False
+Truncated: True
+Early stopped: True
+Early stop repeat key: ((np.int64(10), np.int64(2)), 3, 0)
+
+================================================================================
+

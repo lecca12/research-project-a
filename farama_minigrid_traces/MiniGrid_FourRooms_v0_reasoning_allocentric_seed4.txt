@@ -1,0 +1,60 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: reasoning
+Mode: allocentric
+Seed: 4
+Reached goal: True
+Early stopped: False
+Steps: 1
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . G v # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: - north: resulting cell = (10, 8), legal/illegal = legal, shortest-path progress = closer to goal
+- east: resulting cell = (11, 9), legal/illegal = illegal, shortest-path progress = not valid
+- south: resulting cell = (12, 8), legal/illegal = legal, shortest-path progress = farther from goal
+- west: resulting cell = (11, 7), legal/illegal = legal, shortest-path progress = at goal
+
+The best legal action is west.
+
+Answer: west
+All raw answers: ['- north: resulting cell = (10, 8), legal/illegal = legal, shortest-path progress = closer to goal\n- east: resulting cell = (11, 9), legal/illegal = illegal, shortest-path progress = not valid\n- south: resulting cell = (12, 8), legal/illegal = legal, shortest-path progress = farther from goal\n- west: resulting cell = (11, 7), legal/illegal = legal, shortest-path progress = at goal\n\nThe best legal action is west.\n\nAnswer: west']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['west']
+Optimal relative actions: ['right']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: True
+Terminated: True
+Truncated: False
+Early stopped: False
+Early stop repeat key: ((np.int64(11), np.int64(8)), 1, 3)
+
+================================================================================
+
