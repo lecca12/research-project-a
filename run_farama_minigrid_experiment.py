@@ -98,11 +98,12 @@ def extract_final_action_word(text, mode):
     """
     Extract the final action from a reasoning response.
 
-    Important parser guard:
-    - If an Answer/Final Answer/Final Action marker exists, only the word
-      directly following that marker is considered.
-    - If that marked word is invalid, return None.
-    - Only use whole-response fallback scanning when no marker exists.
+    Rules:
+    - Match answer markers only when they begin a line.
+    - Require the action word to appear on the same line as the marker.
+    - Prefer the last valid marker in the response.
+    - If a marker is present but its marked word is invalid, return None.
+    - Only scan the wider response when no marker appears at all.
     """
     if text is None:
         return None
@@ -117,23 +118,24 @@ def extract_final_action_word(text, mode):
     lowered = text.strip().lower()
 
     marker_pattern = re.compile(
-        r"(?:answer|final\s+answer|final\s+action)\s*:\s*([a-z]+)",
-        flags=re.IGNORECASE,
+        r"^[ \t]*(?:final[ \t]+answer|final[ \t]+action|answer)"
+        r"[ \t]*:[ \t]*([a-z]+)\b",
+        flags=re.IGNORECASE | re.MULTILINE,
     )
 
-    marker_match = marker_pattern.search(lowered)
+    marker_matches = list(marker_pattern.finditer(lowered))
 
-    if marker_match is not None:
-        marked_word = normalize_answer(marker_match.group(1))
+    if marker_matches:
+        marked_word = normalize_answer(
+            marker_matches[-1].group(1)
+        )
 
         if marked_word in valid_words:
             return marked_word
 
-        # Example: "Answer: none" must be a parse failure.
-        # Do not scan earlier reasoning text for another action.
         return None
 
-    # Fallback is only allowed when there is no answer marker at all.
+    # Fallback only when no marked answer line exists anywhere.
     words = re.findall(r"[a-z]+", lowered)
 
     for word in reversed(words):
