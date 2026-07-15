@@ -1,7 +1,6 @@
 import json
 import re
 from pathlib import Path
-from collections import defaultdict
 
 from experiment_utils import normalize_answer
 from llm_policy import make_openai_policy_fn
@@ -13,58 +12,130 @@ from minigrid_wrapper import (
 )
 
 
-ABSOLUTE_ACTIONS = {"north": 0, "east": 1, "south": 2, "west": 3}
-RELATIVE_ACTIONS = {"forward": 0, "right": 1, "backward": 2, "left": 3}
+ABSOLUTE_ACTIONS = {
+    "north": 0,
+    "east": 1,
+    "south": 2,
+    "west": 3,
+}
+
+RELATIVE_ACTIONS = {
+    "forward": 0,
+    "right": 1,
+    "backward": 2,
+    "left": 3,
+}
+
+
+REASONING_SYSTEM_INSTRUCTIONS = (
+    "You are a precise navigation assistant for a grid world experiment. "
+    "Follow the requested candidate-by-candidate reasoning process carefully. "
+    "After completing the reasoning, finish with exactly one final line in "
+    "the form 'Answer: <action>', where <action> is one allowed action word."
+)
 
 
 def make_json_safe(obj):
     if hasattr(obj, "item"):
         return obj.item()
+
     if isinstance(obj, tuple):
-        return [make_json_safe(x) for x in obj]
+        return [make_json_safe(item) for item in obj]
+
     if isinstance(obj, list):
-        return [make_json_safe(x) for x in obj]
+        return [make_json_safe(item) for item in obj]
+
     if isinstance(obj, dict):
-        return {k: make_json_safe(v) for k, v in obj.items()}
+        return {
+            key: make_json_safe(value)
+            for key, value in obj.items()
+        }
+
     return obj
 
 
+def save_results_incrementally(results, output_path):
+    """
+    Rewrite the current complete result list after every finished episode.
+
+    This prevents a late API failure from losing all completed episodes.
+    """
+    temporary_path = output_path.with_suffix(".tmp")
+
+    with temporary_path.open("w", encoding="utf-8") as file:
+        json.dump(
+            make_json_safe(results),
+            file,
+            indent=2,
+        )
+
+    temporary_path.replace(output_path)
+
+
 def parse_action(text, mode, env):
+    """
+    Parse baseline and legality-shield responses.
+
+    These policies are instructed to return one action word only.
+    """
     word = normalize_answer(text)
 
     if mode == "allocentric":
         return ABSOLUTE_ACTIONS.get(word)
 
     if mode == "egocentric":
-        rel_action = RELATIVE_ACTIONS.get(word)
-        if rel_action is None:
+        relative_action = RELATIVE_ACTIONS.get(word)
+
+        if relative_action is None:
             return None
-        return env.relative_to_cardinal(rel_action)
+
+        return env.relative_to_cardinal(relative_action)
 
     raise ValueError(f"Unknown mode: {mode}")
 
 
 def extract_final_action_word(text, mode):
+    """
+    Extract the final action from a reasoning response.
+
+    Important parser guard:
+    - If an Answer/Final Answer/Final Action marker exists, only the word
+      directly following that marker is considered.
+    - If that marked word is invalid, return None.
+    - Only use whole-response fallback scanning when no marker exists.
+    """
     if text is None:
         return None
 
-    valid_words = ABSOLUTE_ACTIONS if mode == "allocentric" else RELATIVE_ACTIONS
+    if mode == "allocentric":
+        valid_words = set(ABSOLUTE_ACTIONS)
+    elif mode == "egocentric":
+        valid_words = set(RELATIVE_ACTIONS)
+    else:
+        raise ValueError(f"Unknown mode: {mode}")
+
     lowered = text.strip().lower()
 
-    patterns = [
-        r"answer\s*:\s*([a-z]+)",
-        r"final action\s*:\s*([a-z]+)",
-        r"final answer\s*:\s*([a-z]+)",
-    ]
+    marker_pattern = re.compile(
+        r"(?:answer|final\s+answer|final\s+action)\s*:\s*([a-z]+)",
+        flags=re.IGNORECASE,
+    )
 
-    for pattern in patterns:
-        match = re.search(pattern, lowered)
-        if match:
-            word = normalize_answer(match.group(1))
-            if word in valid_words:
-                return word
+    marker_match = marker_pattern.search(lowered)
 
+    if marker_match is not None:
+        marked_word = normalize_answer(marker_match.group(1))
+
+        if marked_word in valid_words:
+            return marked_word
+
+        # Example: "Answer: none" must be a parse failure.
+        # Do not scan earlier reasoning text for another action.
+        return None
+
+    # Fallback is only allowed when there is no answer marker at all.
     words = re.findall(r"[a-z]+", lowered)
+
     for word in reversed(words):
         if word in valid_words:
             return word
@@ -81,63 +152,95 @@ def parse_reasoning_action(text, mode, env):
     if mode == "allocentric":
         return ABSOLUTE_ACTIONS.get(word)
 
-    rel_action = RELATIVE_ACTIONS.get(word)
-    if rel_action is None:
+    relative_action = RELATIVE_ACTIONS.get(word)
+
+    if relative_action is None:
         return None
 
-    return env.relative_to_cardinal(rel_action)
+    return env.relative_to_cardinal(relative_action)
 
 
 def get_prompt(env, mode):
     if mode == "allocentric":
         return env.make_allocentric_description()
+
     if mode == "egocentric":
         return env.make_egocentric_description()
+
     raise ValueError(f"Unknown mode: {mode}")
 
 
 def make_reasoning_prompt(base_prompt, mode):
     if mode == "allocentric":
-        action_list = ["north", "east", "south", "west"]
+        action_list = [
+            "north",
+            "east",
+            "south",
+            "west",
+        ]
         final_options = "north, east, south, or west"
-    else:
-        action_list = ["forward", "right", "backward", "left"]
+
+    elif mode == "egocentric":
+        action_list = [
+            "forward",
+            "right",
+            "backward",
+            "left",
+        ]
         final_options = "forward, right, backward, or left"
 
+    else:
+        raise ValueError(f"Unknown mode: {mode}")
+
     candidate_lines = "\n".join(
-        f"- {action}: resulting cell = ?, legal/illegal = ?, shortest-path progress = ?"
+        (
+            f"- {action}: resulting cell = ?, "
+            f"legal/illegal = ?, shortest-path progress = ?"
+        )
         for action in action_list
     )
 
     return f"""{base_prompt}
 
-Now use candidate-evaluation reasoning before choosing.
+Use candidate-evaluation reasoning before choosing.
 
 Evaluate every candidate action explicitly:
 
 {candidate_lines}
 
-For each action:
+For each candidate action:
 1. Work out the resulting cell.
 2. State whether the action is legal or illegal.
-3. State whether it appears to move along a shortest valid path toward the goal.
+3. State whether it appears to preserve progress along a shortest valid path
+   toward the goal.
 
 Then choose the best legal action.
 
-After the reasoning, give your final answer on a new line using exactly this format:
+After the reasoning, give the final answer on a new line using exactly this
+format:
+
 Answer: <one of {final_options}>
 """
 
 
-def classify_error(parse_failure, hit_wall, hit_obstacle, is_correct):
+def classify_error(
+    parse_failure,
+    hit_wall,
+    hit_obstacle,
+    is_correct,
+):
     if parse_failure:
         return "parse_failure"
+
     if hit_obstacle:
         return "obstacle_blindness"
+
     if hit_wall:
         return "boundary_error"
+
     if not is_correct:
         return "directional_or_detour_error"
+
     return "correct"
 
 
@@ -145,51 +248,93 @@ def get_legal_cardinal_actions(env):
     state = env.get_state()
     row, col = state["agent"]
 
-    legal = set()
-    for action, (dr, dc) in ACTION_TO_DELTA.items():
-        blocked, _ = env.is_blocked(row + dr, col + dc)
-        if not blocked:
-            legal.add(action)
+    legal_actions = set()
 
-    return legal
+    for action, (delta_row, delta_col) in ACTION_TO_DELTA.items():
+        target_row = row + delta_row
+        target_col = col + delta_col
+
+        blocked, _ = env.is_blocked(
+            target_row,
+            target_col,
+        )
+
+        if not blocked:
+            legal_actions.add(action)
+
+    return legal_actions
 
 
 def cardinal_to_relative(action, facing):
-    facing_to_cardinal = {0: 1, 1: 2, 2: 3, 3: 0}
-    cardinal_facing = facing_to_cardinal[facing]
+    """
+    Convert project cardinal action index to an egocentric action index.
+
+    MiniGrid facing:
+        0=east, 1=south, 2=west, 3=north
+
+    Project cardinal:
+        0=north, 1=east, 2=south, 3=west
+    """
+    facing_to_cardinal = {
+        0: 1,
+        1: 2,
+        2: 3,
+        3: 0,
+    }
+
+    cardinal_facing = facing_to_cardinal[int(facing)]
     return (action - cardinal_facing) % 4
 
 
 def legal_action_names(env, mode):
-    legal = get_legal_cardinal_actions(env)
+    legal_actions = get_legal_cardinal_actions(env)
 
     if mode == "allocentric":
-        return [ACTION_NAMES[a] for a in sorted(legal)]
+        return [
+            ACTION_NAMES[action]
+            for action in sorted(legal_actions)
+        ]
 
-    facing = env.get_state()["facing"]
-    names = []
-    for action in sorted(legal):
-        rel = cardinal_to_relative(action, facing)
-        names.append(RELATIVE_ACTION_NAMES[rel])
+    if mode == "egocentric":
+        facing = env.get_state()["facing"]
+        relative_names = []
 
-    return names
+        for action in sorted(legal_actions):
+            relative_action = cardinal_to_relative(
+                action,
+                facing,
+            )
+            relative_names.append(
+                RELATIVE_ACTION_NAMES[relative_action]
+            )
+
+        return relative_names
+
+    raise ValueError(f"Unknown mode: {mode}")
 
 
-def make_legality_reprompt(original_prompt, raw_answer, legal_names):
+def make_legality_reprompt(
+    original_prompt,
+    raw_answer,
+    legal_names,
+):
     legal_text = ", ".join(legal_names)
 
     return f"""{original_prompt}
 
 Your previous answer was: {raw_answer}
 
-That action is illegal from the current state because it would move into a wall, obstacle, or outside the grid.
+That proposed action is illegal from the current state because it would move
+into an obstacle, the outer boundary, or outside the grid.
 
-Choose a legal action instead.
+The illegal action was not executed.
 
-Legal actions available now:
+Choose again using only one of the currently legal actions:
+
 {legal_text}
 
-Answer with one word only from: {legal_text}
+Answer with one word only from:
+{legal_text}
 """
 
 
@@ -204,7 +349,11 @@ def choose_action(
 ):
     if policy_type == "baseline":
         raw_answer = short_policy_fn(prompt)
-        parsed_action = parse_action(raw_answer, mode, env)
+        parsed_action = parse_action(
+            raw_answer,
+            mode,
+            env,
+        )
 
         return parsed_action, {
             "policy_type": policy_type,
@@ -214,13 +363,27 @@ def choose_action(
             "shield_reprompts": 0,
             "reasoning_used": False,
             "reasoning_prompt": None,
-            "legal_action_names": legal_action_names(env, mode),
+            "legal_action_names": legal_action_names(
+                env,
+                mode,
+            ),
         }
 
     if policy_type == "reasoning":
-        reasoning_prompt = make_reasoning_prompt(prompt, mode)
-        raw_answer = reasoning_policy_fn(reasoning_prompt)
-        parsed_action = parse_reasoning_action(raw_answer, mode, env)
+        reasoning_prompt = make_reasoning_prompt(
+            prompt,
+            mode,
+        )
+
+        raw_answer = reasoning_policy_fn(
+            reasoning_prompt
+        )
+
+        parsed_action = parse_reasoning_action(
+            raw_answer,
+            mode,
+            env,
+        )
 
         return parsed_action, {
             "policy_type": policy_type,
@@ -230,23 +393,40 @@ def choose_action(
             "shield_reprompts": 0,
             "reasoning_used": True,
             "reasoning_prompt": reasoning_prompt,
-            "legal_action_names": legal_action_names(env, mode),
+            "legal_action_names": legal_action_names(
+                env,
+                mode,
+            ),
         }
 
     if policy_type == "legality_shield":
         legal_actions = get_legal_cardinal_actions(env)
-        legal_names = legal_action_names(env, mode)
+        legal_names = legal_action_names(
+            env,
+            mode,
+        )
 
         all_raw_answers = []
         current_prompt = prompt
+        last_parsed_action = None
 
         for attempt in range(max_reprompts + 1):
-            raw_answer = short_policy_fn(current_prompt)
+            raw_answer = short_policy_fn(
+                current_prompt
+            )
             all_raw_answers.append(raw_answer)
 
-            parsed_action = parse_action(raw_answer, mode, env)
+            parsed_action = parse_action(
+                raw_answer,
+                mode,
+                env,
+            )
+            last_parsed_action = parsed_action
 
-            if parsed_action is not None and parsed_action in legal_actions:
+            if (
+                parsed_action is not None
+                and parsed_action in legal_actions
+            ):
                 return parsed_action, {
                     "policy_type": policy_type,
                     "raw_model_answer": raw_answer,
@@ -264,9 +444,13 @@ def choose_action(
                 legal_names=legal_names,
             )
 
-        return parsed_action, {
+        return last_parsed_action, {
             "policy_type": policy_type,
-            "raw_model_answer": all_raw_answers[-1] if all_raw_answers else None,
+            "raw_model_answer": (
+                all_raw_answers[-1]
+                if all_raw_answers
+                else None
+            ),
             "all_raw_answers": all_raw_answers,
             "shield_used": True,
             "shield_reprompts": max_reprompts,
@@ -275,75 +459,185 @@ def choose_action(
             "legal_action_names": legal_names,
         }
 
-    raise ValueError(f"Unknown policy_type: {policy_type}")
-
-
-def should_early_stop(repeat_counts, state_before, parsed_action, threshold):
-    if threshold is None:
-        return False, None
-
-    key = (
-        tuple(state_before["agent"]),
-        int(state_before["facing"]),
-        int(parsed_action) if parsed_action is not None else None,
+    raise ValueError(
+        f"Unknown policy_type: {policy_type}"
     )
 
-    repeat_counts[key] += 1
 
-    if repeat_counts[key] >= threshold:
-        return True, key
+def update_consecutive_repeat_state(
+    previous_key,
+    previous_streak,
+    current_key,
+    threshold,
+):
+    """
+    Update the consecutive-repeat streak.
 
-    return False, key
+    A repeat only counts when the current state-action key is identical to the
+    immediately preceding key.
+
+    Examples:
+        A, A, A -> streak reaches 3 and stops
+        A, B, A -> streak is reset; does not stop
+    """
+    if threshold is None:
+        return False, current_key, 1
+
+    if current_key == previous_key:
+        current_streak = previous_streak + 1
+    else:
+        current_streak = 1
+
+    should_stop = current_streak >= threshold
+
+    return (
+        should_stop,
+        current_key,
+        current_streak,
+    )
 
 
-def save_episode_trace(result, output_dir="farama_minigrid_traces"):
-    output_path = Path(output_dir)
-    output_path.mkdir(exist_ok=True)
+def save_episode_trace(
+    result,
+    output_dir="farama_minigrid_traces_s9n1_sanity",
+):
+    output_directory = Path(output_dir)
+    output_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
 
-    safe_env_name = result["env_name"].replace("/", "_").replace("-", "_")
+    safe_environment_name = (
+        result["env_name"]
+        .replace("/", "_")
+        .replace("-", "_")
+    )
+
     filename = (
-        f"{safe_env_name}_"
+        f"{safe_environment_name}_"
         f"{result['policy_type']}_"
         f"{result['mode']}_"
         f"seed{result['seed']}.txt"
     )
 
-    path = output_path / filename
+    output_path = output_directory / filename
 
-    with path.open("w", encoding="utf-8") as f:
-        f.write(f"Environment: {result['env_name']}\n")
-        f.write(f"Policy: {result['policy_type']}\n")
-        f.write(f"Mode: {result['mode']}\n")
-        f.write(f"Seed: {result['seed']}\n")
-        f.write(f"Reached goal: {result['reached_goal']}\n")
-        f.write(f"Early stopped: {result['early_stopped']}\n")
-        f.write(f"Steps: {result['num_steps']}\n")
-        f.write("=" * 80 + "\n\n")
+    with output_path.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        file.write(
+            f"Environment: {result['env_name']}\n"
+        )
+        file.write(
+            f"Policy: {result['policy_type']}\n"
+        )
+        file.write(
+            f"Mode: {result['mode']}\n"
+        )
+        file.write(
+            f"Seed: {result['seed']}\n"
+        )
+        file.write(
+            f"Reached goal: {result['reached_goal']}\n"
+        )
+        file.write(
+            f"Early stopped: {result['early_stopped']}\n"
+        )
+        file.write(
+            f"Steps: {result['num_steps']}\n"
+        )
+        file.write("=" * 80 + "\n\n")
 
-        for step in result["step_logs"]:
-            f.write(f"STEP {step['step']}\n")
-            f.write("-" * 80 + "\n")
-            f.write(step["grid_text"] + "\n\n")
-            f.write(f"Raw answer: {step.get('raw_model_answer')}\n")
-            f.write(f"All raw answers: {step.get('all_raw_answers')}\n")
-            f.write(f"Parsed action: {step.get('parsed_action_name')}\n")
-            f.write(f"Parsed action index: {step.get('parsed_action')}\n")
-            f.write(f"Optimal actions: {step.get('optimal_action_names')}\n")
-            f.write(f"Optimal relative actions: {step.get('optimal_relative_action_names')}\n")
-            f.write(f"Legal actions: {step.get('legal_action_names')}\n")
-            f.write(f"Correct: {step.get('is_correct')}\n")
-            f.write(f"Hit boundary: {step.get('hit_wall')}\n")
-            f.write(f"Hit obstacle/interior wall: {step.get('hit_obstacle')}\n")
-            f.write(f"Blocked type: {step.get('blocked_type')}\n")
-            f.write(f"Error type: {step.get('error_type')}\n")
-            f.write(f"Shield used: {step.get('shield_used')}\n")
-            f.write(f"Shield reprompts: {step.get('shield_reprompts')}\n")
-            f.write(f"Reasoning used: {step.get('reasoning_used')}\n")
-            f.write(f"Terminated: {step.get('terminated')}\n")
-            f.write(f"Truncated: {step.get('truncated')}\n")
-            f.write(f"Early stopped: {step.get('early_stopped')}\n")
-            f.write(f"Early stop repeat key: {step.get('early_stop_repeat_key')}\n")
-            f.write("\n" + "=" * 80 + "\n\n")
+        for step_log in result["step_logs"]:
+            file.write(
+                f"STEP {step_log['step']}\n"
+            )
+            file.write("-" * 80 + "\n")
+            file.write(
+                step_log["grid_text"] + "\n\n"
+            )
+            file.write(
+                "Raw answer: "
+                f"{step_log.get('raw_model_answer')}\n"
+            )
+            file.write(
+                "All raw answers: "
+                f"{step_log.get('all_raw_answers')}\n"
+            )
+            file.write(
+                "Parsed action: "
+                f"{step_log.get('parsed_action_name')}\n"
+            )
+            file.write(
+                "Parsed action index: "
+                f"{step_log.get('parsed_action')}\n"
+            )
+            file.write(
+                "Optimal actions: "
+                f"{step_log.get('optimal_action_names')}\n"
+            )
+            file.write(
+                "Optimal relative actions: "
+                f"{step_log.get('optimal_relative_action_names')}\n"
+            )
+            file.write(
+                "Legal actions: "
+                f"{step_log.get('legal_action_names')}\n"
+            )
+            file.write(
+                f"Correct: {step_log.get('is_correct')}\n"
+            )
+            file.write(
+                f"Hit boundary: {step_log.get('hit_wall')}\n"
+            )
+            file.write(
+                "Hit obstacle/interior wall: "
+                f"{step_log.get('hit_obstacle')}\n"
+            )
+            file.write(
+                "Blocked type: "
+                f"{step_log.get('blocked_type')}\n"
+            )
+            file.write(
+                "Error type: "
+                f"{step_log.get('error_type')}\n"
+            )
+            file.write(
+                "Shield used: "
+                f"{step_log.get('shield_used')}\n"
+            )
+            file.write(
+                "Shield reprompts: "
+                f"{step_log.get('shield_reprompts')}\n"
+            )
+            file.write(
+                "Reasoning used: "
+                f"{step_log.get('reasoning_used')}\n"
+            )
+            file.write(
+                "Consecutive repeat streak: "
+                f"{step_log.get('consecutive_repeat_streak')}\n"
+            )
+            file.write(
+                "Early stop key: "
+                f"{step_log.get('early_stop_repeat_key')}\n"
+            )
+            file.write(
+                "Terminated: "
+                f"{step_log.get('terminated')}\n"
+            )
+            file.write(
+                "Truncated: "
+                f"{step_log.get('truncated')}\n"
+            )
+            file.write(
+                "Early stopped: "
+                f"{step_log.get('early_stopped')}\n"
+            )
+            file.write(
+                "\n" + "=" * 80 + "\n\n"
+            )
 
 
 def run_episode(
@@ -357,23 +651,34 @@ def run_episode(
     early_stop_repeats=3,
     verbose=False,
 ):
-    env = MiniGridCardinalWrapper(env_name=env_name, seed=seed)
+    env = MiniGridCardinalWrapper(
+        env_name=env_name,
+        seed=seed,
+    )
     env.reset(seed=seed)
 
     step_logs = []
     reached_goal = False
     early_stopped = False
-    repeat_counts = defaultdict(int)
+
+    previous_repeat_key = None
+    consecutive_repeat_streak = 0
 
     for step in range(max_steps):
         prompt = get_prompt(env, mode)
+
         optimal_actions = env.get_optimal_actions()
-        optimal_action_names = env.get_optimal_action_names()
-        optimal_relative_action_names = env.get_optimal_relative_action_names()
+        optimal_action_names = (
+            env.get_optimal_action_names()
+        )
+        optimal_relative_action_names = (
+            env.get_optimal_relative_action_names()
+        )
+
         grid_text = env.render_text()
         state_before = env.get_state()
 
-        parsed_action, action_meta = choose_action(
+        parsed_action, action_metadata = choose_action(
             env=env,
             mode=mode,
             policy_type=policy_type,
@@ -382,9 +687,15 @@ def run_episode(
             reasoning_policy_fn=reasoning_policy_fn,
         )
 
-        raw_answer = action_meta["raw_model_answer"]
+        raw_answer = action_metadata[
+            "raw_model_answer"
+        ]
+
         parse_failure = parsed_action is None
-        is_correct = (not parse_failure) and parsed_action in optimal_actions
+        is_correct = (
+            not parse_failure
+            and parsed_action in optimal_actions
+        )
 
         if parse_failure:
             step_logs.append({
@@ -393,18 +704,39 @@ def run_episode(
                 "agent_pos": state_before["agent"],
                 "goal_pos": state_before["goal"],
                 "facing": state_before["facing"],
-                "facing_name": state_before["facing_name"],
+                "facing_name": state_before[
+                    "facing_name"
+                ],
                 "raw_model_answer": raw_answer,
-                "all_raw_answers": action_meta["all_raw_answers"],
+                "all_raw_answers": action_metadata[
+                    "all_raw_answers"
+                ],
                 "parsed_action": None,
-                "optimal_actions": sorted(optimal_actions),
-                "optimal_action_names": optimal_action_names,
-                "optimal_relative_action_names": optimal_relative_action_names,
-                "legal_action_names": action_meta["legal_action_names"],
-                "shield_used": action_meta["shield_used"],
-                "shield_reprompts": action_meta["shield_reprompts"],
-                "reasoning_used": action_meta["reasoning_used"],
-                "reasoning_prompt": action_meta["reasoning_prompt"],
+                "parsed_action_name": None,
+                "optimal_actions": sorted(
+                    optimal_actions
+                ),
+                "optimal_action_names": (
+                    optimal_action_names
+                ),
+                "optimal_relative_action_names": (
+                    optimal_relative_action_names
+                ),
+                "legal_action_names": action_metadata[
+                    "legal_action_names"
+                ],
+                "shield_used": action_metadata[
+                    "shield_used"
+                ],
+                "shield_reprompts": action_metadata[
+                    "shield_reprompts"
+                ],
+                "reasoning_used": action_metadata[
+                    "reasoning_used"
+                ],
+                "reasoning_prompt": action_metadata[
+                    "reasoning_prompt"
+                ],
                 "is_valid_format": False,
                 "is_correct": False,
                 "parse_failure": True,
@@ -412,16 +744,24 @@ def run_episode(
                 "reward": None,
                 "hit_wall": False,
                 "hit_obstacle": False,
+                "blocked_type": None,
                 "terminated": False,
                 "truncated": False,
                 "early_stopped": False,
                 "early_stop_repeat_key": None,
+                "consecutive_repeat_streak": 0,
                 "grid_text": grid_text,
                 "prompt": prompt,
             })
             break
 
-        next_state, reward, terminated, truncated, info = env.step_cardinal(parsed_action)
+        (
+            next_state,
+            reward,
+            terminated,
+            truncated,
+            info,
+        ) = env.step_cardinal(parsed_action)
 
         error_type = classify_error(
             parse_failure=False,
@@ -430,10 +770,20 @@ def run_episode(
             is_correct=is_correct,
         )
 
-        stop_now, repeat_key = should_early_stop(
-            repeat_counts=repeat_counts,
-            state_before=state_before,
-            parsed_action=parsed_action,
+        repeat_key = (
+            tuple(state_before["agent"]),
+            int(state_before["facing"]),
+            int(parsed_action),
+        )
+
+        (
+            stop_now,
+            previous_repeat_key,
+            consecutive_repeat_streak,
+        ) = update_consecutive_repeat_state(
+            previous_key=previous_repeat_key,
+            previous_streak=consecutive_repeat_streak,
+            current_key=repeat_key,
             threshold=early_stop_repeats,
         )
 
@@ -447,51 +797,108 @@ def run_episode(
             "agent_pos": state_before["agent"],
             "goal_pos": state_before["goal"],
             "facing": state_before["facing"],
-            "facing_name": state_before["facing_name"],
+            "facing_name": state_before[
+                "facing_name"
+            ],
             "raw_model_answer": raw_answer,
-            "all_raw_answers": action_meta["all_raw_answers"],
+            "all_raw_answers": action_metadata[
+                "all_raw_answers"
+            ],
             "parsed_action": parsed_action,
-            "parsed_action_name": info["action_name"],
-            "optimal_actions": sorted(optimal_actions),
-            "optimal_action_names": optimal_action_names,
-            "optimal_relative_action_names": optimal_relative_action_names,
-            "legal_action_names": action_meta["legal_action_names"],
-            "shield_used": action_meta["shield_used"],
-            "shield_reprompts": action_meta["shield_reprompts"],
-            "reasoning_used": action_meta["reasoning_used"],
-            "reasoning_prompt": action_meta["reasoning_prompt"],
+            "parsed_action_name": info[
+                "action_name"
+            ],
+            "optimal_actions": sorted(
+                optimal_actions
+            ),
+            "optimal_action_names": (
+                optimal_action_names
+            ),
+            "optimal_relative_action_names": (
+                optimal_relative_action_names
+            ),
+            "legal_action_names": action_metadata[
+                "legal_action_names"
+            ],
+            "shield_used": action_metadata[
+                "shield_used"
+            ],
+            "shield_reprompts": action_metadata[
+                "shield_reprompts"
+            ],
+            "reasoning_used": action_metadata[
+                "reasoning_used"
+            ],
+            "reasoning_prompt": action_metadata[
+                "reasoning_prompt"
+            ],
             "is_valid_format": True,
             "is_correct": is_correct,
             "parse_failure": False,
             "error_type": error_type,
             "reward": reward,
             "hit_wall": info["hit_wall"],
-            "hit_obstacle": info["hit_obstacle"],
-            "blocked_type": info["blocked_type"],
+            "hit_obstacle": info[
+                "hit_obstacle"
+            ],
+            "blocked_type": info[
+                "blocked_type"
+            ],
             "terminated": terminated,
             "truncated": truncated,
             "early_stopped": early_stopped,
             "early_stop_repeat_key": repeat_key,
-            "next_agent_pos": next_state["agent"],
-            "next_facing": next_state["facing"],
-            "next_facing_name": next_state["facing_name"],
+            "consecutive_repeat_streak": (
+                consecutive_repeat_streak
+            ),
+            "next_agent_pos": next_state[
+                "agent"
+            ],
+            "next_facing": next_state[
+                "facing"
+            ],
+            "next_facing_name": next_state[
+                "facing_name"
+            ],
             "grid_text": grid_text,
             "prompt": prompt,
         })
 
         if verbose:
             print("\n" + "=" * 80)
-            print(f"Env={env_name}, policy={policy_type}, seed={seed}, mode={mode}, step={step}")
+            print(
+                f"Environment={env_name}, "
+                f"policy={policy_type}, "
+                f"seed={seed}, mode={mode}, "
+                f"step={step}"
+            )
             print(grid_text)
             print("Raw answer:", raw_answer)
-            print("Parsed action:", parsed_action, info["action_name"])
-            print("Legal actions:", action_meta["legal_action_names"])
-            print("Optimal allocentric:", optimal_action_names)
-            print("Optimal egocentric:", optimal_relative_action_names)
+            print(
+                "Parsed action:",
+                parsed_action,
+                info["action_name"],
+            )
+            print(
+                "Legal actions:",
+                action_metadata[
+                    "legal_action_names"
+                ],
+            )
+            print(
+                "Optimal allocentric:",
+                optimal_action_names,
+            )
+            print(
+                "Optimal egocentric:",
+                optimal_relative_action_names,
+            )
             print("Correct:", is_correct)
             print("Error:", error_type)
-            print("Reward:", reward)
-            print("Info:", info)
+            print(
+                "Consecutive repeat streak:",
+                consecutive_repeat_streak,
+            )
             print("Early stop:", stop_now)
 
         if terminated:
@@ -508,50 +915,64 @@ def run_episode(
         "env_name": env_name,
         "policy_type": policy_type,
         "mode": mode,
-        "seed": seed,
+        "seed": int(seed),
         "num_steps": len(step_logs),
         "reached_goal": reached_goal,
         "early_stopped": early_stopped,
         "early_stop_repeats": early_stop_repeats,
         "final_state": final_state["agent"],
         "final_facing": final_state["facing"],
-        "final_facing_name": final_state["facing_name"],
+        "final_facing_name": final_state[
+            "facing_name"
+        ],
         "max_steps": max_steps,
         "step_logs": step_logs,
     }
 
 
 def main():
+    # Supervisor-requested sanity run:
+    # rerun only SimpleCrossing S9N1 with 10 paired seeds.
     env_names = [
         "MiniGrid-SimpleCrossingS9N1-v0",
-        "MiniGrid-SimpleCrossingS9N2-v0",
-        "MiniGrid-SimpleCrossingS9N3-v0",
-        "MiniGrid-FourRooms-v0",
     ]
 
     seeds = list(range(10))
-    modes = ["allocentric", "egocentric"]
 
-    policy_types = ["baseline", "legality_shield", "reasoning"]
+    modes = [
+        "allocentric",
+        "egocentric",
+    ]
+
+    policy_types = [
+        "baseline",
+        "legality_shield",
+        "reasoning",
+    ]
 
     max_steps_by_env = {
         "MiniGrid-SimpleCrossingS9N1-v0": 9 ** 2,
-        "MiniGrid-SimpleCrossingS9N2-v0": 9 ** 2,
-        "MiniGrid-SimpleCrossingS9N3-v0": 9 ** 2,
-        "MiniGrid-FourRooms-v0": 19 ** 2,
     }
 
     early_stop_repeats = 3
     save_traces = True
 
     model = "gpt-4o-mini"
+
+    # GPT-4o-mini supports deterministic temperature zero in all arms.
     short_temperature = 0.0
-    reasoning_temperature = None
+    reasoning_temperature = 0.0
+
     short_max_output_tokens = 16
     reasoning_max_output_tokens = 1500
 
-    output_path = Path("farama_minigrid_results.json")
-    metadata_path = Path("farama_minigrid_results_metadata.json")
+    # Use new filenames so the previous verified run is preserved.
+    output_path = Path(
+        "farama_minigrid_results_s9n1_sanity.json"
+    )
+    metadata_path = Path(
+        "farama_minigrid_results_s9n1_sanity_metadata.json"
+    )
 
     short_policy_fn = make_openai_policy_fn(
         model=model,
@@ -562,27 +983,101 @@ def main():
     reasoning_policy_fn = make_openai_policy_fn(
         model=model,
         temperature=reasoning_temperature,
-        max_output_tokens=reasoning_max_output_tokens,
+        system_instructions=(
+            REASONING_SYSTEM_INSTRUCTIONS
+        ),
+        max_output_tokens=(
+            reasoning_max_output_tokens
+        ),
     )
 
     all_results = []
 
-    print("\nRUNNING OFFICIAL FARAMA MINIGRID EXPERIMENT")
+    # Start a fresh sanity-run results file immediately.
+    save_results_incrementally(
+        all_results,
+        output_path,
+    )
+
+    metadata = {
+        "run_type": "s9n1_prompt_cleanup_sanity_check",
+        "env_names": env_names,
+        "seeds": seeds,
+        "num_seeds": len(seeds),
+        "modes": modes,
+        "policy_types": policy_types,
+        "max_steps_by_env": max_steps_by_env,
+        "early_stop_rule": (
+            "three consecutive identical "
+            "(agent_position, facing, parsed_action) keys"
+        ),
+        "early_stop_repeats": early_stop_repeats,
+        "save_traces": save_traces,
+        "model": model,
+        "short_temperature": short_temperature,
+        "reasoning_temperature": (
+            reasoning_temperature
+        ),
+        "short_max_output_tokens": (
+            short_max_output_tokens
+        ),
+        "reasoning_max_output_tokens": (
+            reasoning_max_output_tokens
+        ),
+        "output_file": str(output_path),
+    }
+
+    with metadata_path.open(
+        "w",
+        encoding="utf-8",
+    ) as file:
+        json.dump(
+            make_json_safe(metadata),
+            file,
+            indent=2,
+        )
+
+    print(
+        "\nRUNNING OFFICIAL FARAMA MINIGRID "
+        "S9N1 SANITY EXPERIMENT"
+    )
     print("=" * 80)
     print("Environments:", env_names)
     print("Seeds:", seeds)
     print("Modes:", modes)
     print("Policy types:", policy_types)
-    print("Early stop repeats:", early_stop_repeats)
+    print(
+        "Early stop repeats:",
+        early_stop_repeats,
+    )
     print("Save traces:", save_traces)
-    print("Short max output tokens:", short_max_output_tokens)
-    print("Reasoning max output tokens:", reasoning_max_output_tokens)
+    print(
+        "Short temperature:",
+        short_temperature,
+    )
+    print(
+        "Reasoning temperature:",
+        reasoning_temperature,
+    )
+    print(
+        "Short max output tokens:",
+        short_max_output_tokens,
+    )
+    print(
+        "Reasoning max output tokens:",
+        reasoning_max_output_tokens,
+    )
 
     for env_name in env_names:
-        max_steps = max_steps_by_env[env_name]
+        max_steps = max_steps_by_env[
+            env_name
+        ]
 
         print("\n" + "=" * 80)
-        print(f"ENVIRONMENT: {env_name}, max_steps={max_steps}")
+        print(
+            f"ENVIRONMENT: {env_name}, "
+            f"max_steps={max_steps}"
+        )
         print("=" * 80)
 
         for seed in seeds:
@@ -591,7 +1086,10 @@ def main():
 
             for policy_type in policy_types:
                 for mode in modes:
-                    print(f"Running policy={policy_type}, mode={mode}")
+                    print(
+                        f"Running policy={policy_type}, "
+                        f"mode={mode}"
+                    )
 
                     result = run_episode(
                         env_name=env_name,
@@ -599,59 +1097,62 @@ def main():
                         mode=mode,
                         policy_type=policy_type,
                         short_policy_fn=short_policy_fn,
-                        reasoning_policy_fn=reasoning_policy_fn,
+                        reasoning_policy_fn=(
+                            reasoning_policy_fn
+                        ),
                         max_steps=max_steps,
-                        early_stop_repeats=early_stop_repeats,
+                        early_stop_repeats=(
+                            early_stop_repeats
+                        ),
                         verbose=False,
                     )
 
                     result["model"] = model
-                    result["short_temperature"] = short_temperature
-                    result["reasoning_temperature"] = reasoning_temperature
-                    result["short_max_output_tokens"] = short_max_output_tokens
-                    result["reasoning_max_output_tokens"] = reasoning_max_output_tokens
+                    result[
+                        "short_temperature"
+                    ] = short_temperature
+                    result[
+                        "reasoning_temperature"
+                    ] = reasoning_temperature
+                    result[
+                        "short_max_output_tokens"
+                    ] = short_max_output_tokens
+                    result[
+                        "reasoning_max_output_tokens"
+                    ] = reasoning_max_output_tokens
 
                     all_results.append(result)
+
+                    # Save immediately after every completed episode.
+                    save_results_incrementally(
+                        all_results,
+                        output_path,
+                    )
 
                     if save_traces:
                         save_episode_trace(result)
 
                     print(
-                        f"  reached_goal={result['reached_goal']}, "
-                        f"early_stopped={result['early_stopped']}, "
-                        f"steps={result['num_steps']}, "
-                        f"final_state={result['final_state']}"
+                        "  "
+                        f"reached_goal="
+                        f"{result['reached_goal']}, "
+                        f"early_stopped="
+                        f"{result['early_stopped']}, "
+                        f"steps="
+                        f"{result['num_steps']}, "
+                        f"final_state="
+                        f"{result['final_state']}"
                     )
-
-    with output_path.open("w", encoding="utf-8") as f:
-        json.dump(make_json_safe(all_results), f, indent=2)
-
-    metadata = {
-        "env_names": env_names,
-        "seeds": seeds,
-        "num_seeds": len(seeds),
-        "modes": modes,
-        "policy_types": policy_types,
-        "max_steps_by_env": max_steps_by_env,
-        "early_stop_repeats": early_stop_repeats,
-        "save_traces": save_traces,
-        "max_steps_rule": "environment_specific_grid_size_squared",
-        "model": model,
-        "short_temperature": short_temperature,
-        "reasoning_temperature": reasoning_temperature,
-        "short_max_output_tokens": short_max_output_tokens,
-        "reasoning_max_output_tokens": reasoning_max_output_tokens,
-        "output_file": str(output_path),
-    }
-
-    with metadata_path.open("w", encoding="utf-8") as f:
-        json.dump(make_json_safe(metadata), f, indent=2)
 
     print("\nSaved:")
     print("-", output_path)
     print("-", metadata_path)
+
     if save_traces:
-        print("- farama_minigrid_traces/")
+        print(
+            "- "
+            "farama_minigrid_traces_s9n1_sanity/"
+        )
 
 
 if __name__ == "__main__":
