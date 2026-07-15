@@ -44,13 +44,18 @@ RELATIVE_ACTION_NAMES = {
 
 class MiniGridCardinalWrapper:
     """
-    Thin MiniGrid wrapper using the same direct cardinal-move convention
-    as the original GridWorld project.
+    Thin wrapper over official Farama MiniGrid environments.
 
-    This intentionally does not use MiniGrid's native turn-left/turn-right/
-    move-forward action semantics. Instead, actions directly attempt to move
-    north/east/south/west so that the main experimental difference between
-    allocentric and egocentric prompts remains the action frame.
+    The wrapper uses direct cardinal actions rather than MiniGrid's native
+    turn-left, turn-right, and move-forward action semantics. This preserves
+    the experimental comparison between allocentric and egocentric action
+    frames while keeping the underlying Farama environment unchanged.
+
+    Project cardinal convention:
+        0 = north
+        1 = east
+        2 = south
+        3 = west
     """
 
     def __init__(self, env_name="MiniGrid-Empty-8x8-v0", seed=0):
@@ -64,8 +69,8 @@ class MiniGridCardinalWrapper:
         if seed is None:
             seed = self.seed
 
-        self.seed = seed
-        self.obs, self.info = self.env.reset(seed=seed)
+        self.seed = int(seed)
+        self.obs, self.info = self.env.reset(seed=self.seed)
         return self.get_state()
 
     @property
@@ -76,7 +81,11 @@ class MiniGridCardinalWrapper:
         self.env.close()
 
     def _is_outer_boundary_cell(self, row, col):
+        """
+        Return True when a cell lies on the outer frame of the MiniGrid map.
+        """
         grid = self.unwrapped.grid
+
         return (
             row == 0
             or row == grid.height - 1
@@ -85,16 +94,25 @@ class MiniGridCardinalWrapper:
         )
 
     def get_state(self):
+        """
+        Return the current state using ordinary Python integers.
+
+        The prompt-facing obstacle list includes interior walls and other
+        blocking objects exactly once. Outer boundary walls are omitted from
+        the obstacle list because the grid dimensions already define the
+        boundary.
+        """
         env = self.unwrapped
         grid = env.grid
 
-        agent_xy = tuple(env.agent_pos)
-        agent_rc = (agent_xy[1], agent_xy[0])
+        # Explicit int casts prevent np.int64 values leaking into prompts/JSON.
+        agent_x = int(env.agent_pos[0])
+        agent_y = int(env.agent_pos[1])
+        agent_rc = (agent_y, agent_x)
+
         facing = int(env.agent_dir)
 
         goal_pos = None
-        boundary_cells = []
-        interior_wall_cells = []
         obstacle_cells = []
 
         for y in range(grid.height):
@@ -104,36 +122,57 @@ class MiniGridCardinalWrapper:
                 if cell is None:
                     continue
 
-                rc = (y, x)
+                row = int(y)
+                col = int(x)
+                rc = (row, col)
 
                 if cell.type == "goal":
                     goal_pos = rc
-                elif cell.type == "wall":
-                    if self._is_outer_boundary_cell(y, x):
-                        boundary_cells.append(rc)
-                    else:
-                        interior_wall_cells.append(rc)
-                        obstacle_cells.append((rc, "interior_wall"))
-                else:
-                    obstacle_cells.append((rc, cell.type))
+                    continue
+
+                if cell.type == "wall":
+                    # Do not enumerate the outer boundary in the prompt.
+                    if self._is_outer_boundary_cell(row, col):
+                        continue
+
+                    # Interior walls are obstacle-like cells.
+                    obstacle_cells.append(rc)
+                    continue
+
+                # Any other non-empty, non-goal object is obstacle-like for
+                # this navigation task.
+                obstacle_cells.append(rc)
+
+        # Preserve deterministic ordering and prevent accidental duplicates.
+        obstacle_cells = sorted(set(obstacle_cells))
 
         return {
-            "grid_size": (grid.height, grid.width),
+            "grid_size": (int(grid.height), int(grid.width)),
             "agent": agent_rc,
             "goal": goal_pos,
             "facing": facing,
             "facing_name": DIRECTION_NAMES[facing],
-            "wall_cells": boundary_cells,
-            "boundary_cells": boundary_cells,
-            "interior_wall_cells": interior_wall_cells,
             "obstacle_cells": obstacle_cells,
         }
 
     def is_blocked(self, row, col):
+        """
+        Determine whether a target cell is blocked.
+
+        Returns:
+            (blocked, blocked_type)
+
+        blocked_type:
+            "boundary"  - outside the grid or an outer-frame wall
+            "obstacle"  - an interior wall or another blocking object
+            None        - free cell or goal
+        """
         env = self.unwrapped
         grid = env.grid
 
-        # Outside the grid is a true boundary error.
+        row = int(row)
+        col = int(col)
+
         if row < 0 or row >= grid.height or col < 0 or col >= grid.width:
             return True, "boundary"
 
@@ -146,14 +185,11 @@ class MiniGridCardinalWrapper:
             return False, None
 
         if cell.type == "wall":
-            # Outer frame walls are boundary errors.
             if self._is_outer_boundary_cell(row, col):
                 return True, "boundary"
 
-            # Interior walls in SimpleCrossing/FourRooms are obstacle-like.
             return True, "obstacle"
 
-        # Lava, doors, balls, boxes, keys, etc. are obstacle-like for this task.
         return True, "obstacle"
 
     def _is_free(self, row, col):
@@ -169,11 +205,21 @@ class MiniGridCardinalWrapper:
             next_col = col + dc
 
             if self._is_free(next_row, next_col):
-                neighbors.append((action, (next_row, next_col)))
+                neighbors.append(
+                    (
+                        action,
+                        (int(next_row), int(next_col)),
+                    )
+                )
 
         return neighbors
 
     def _shortest_distance(self, start, goal):
+        """
+        Compute BFS distance from start to goal.
+
+        Returns None when the goal is unreachable.
+        """
         if start == goal:
             return 0
 
@@ -181,17 +227,17 @@ class MiniGridCardinalWrapper:
         visited = {start}
 
         while queue:
-            current, dist = queue.popleft()
+            current, distance = queue.popleft()
 
-            for _, neighbor in self._neighbors(current):
-                if neighbor in visited:
+            for _, neighbour in self._neighbors(current):
+                if neighbour in visited:
                     continue
 
-                if neighbor == goal:
-                    return dist + 1
+                if neighbour == goal:
+                    return distance + 1
 
-                visited.add(neighbor)
-                queue.append((neighbor, dist + 1))
+                visited.add(neighbour)
+                queue.append((neighbour, distance + 1))
 
         return None
 
@@ -199,47 +245,53 @@ class MiniGridCardinalWrapper:
         """
         Return all cardinal actions that preserve a shortest path.
 
-        This mirrors the original GridWorld logic:
-        an action is optimal if moving to that neighbour reduces the
-        BFS distance to the goal by exactly one.
+        An action is optimal when moving to its neighbouring cell reduces
+        the BFS distance to the goal by exactly one. This accepts every
+        equally optimal first action rather than selecting one shortest path.
         """
         state = self.get_state()
         start = state["agent"]
         goal = state["goal"]
 
-        if goal is None:
+        if goal is None or start == goal:
             return set()
 
-        if start == goal:
+        shortest_distance = self._shortest_distance(start, goal)
+
+        if shortest_distance is None:
             return set()
 
-        shortest = self._shortest_distance(start, goal)
-        if shortest is None:
-            return set()
-
-        optimal = set()
+        optimal_actions = set()
 
         for action, next_pos in self._neighbors(start):
-            next_dist = self._shortest_distance(next_pos, goal)
+            next_distance = self._shortest_distance(next_pos, goal)
 
-            if next_dist is not None and 1 + next_dist == shortest:
-                optimal.add(action)
+            if (
+                next_distance is not None
+                and 1 + next_distance == shortest_distance
+            ):
+                optimal_actions.add(action)
 
-        return optimal
+        return optimal_actions
 
     def get_optimal_action_names(self):
-        return [ACTION_NAMES[action] for action in sorted(self.get_optimal_actions())]
+        return [
+            ACTION_NAMES[action]
+            for action in sorted(self.get_optimal_actions())
+        ]
 
     def get_optimal_relative_action_names(self):
         """
         Convert optimal cardinal actions into egocentric action names
-        relative to the current MiniGrid facing direction.
+        relative to the current facing direction.
         """
-        facing = self.unwrapped.agent_dir
+        facing = int(self.unwrapped.agent_dir)
 
-        # MiniGrid facing -> project cardinal action index.
-        # MiniGrid: 0=east, 1=south, 2=west, 3=north
-        # Project:  0=north, 1=east, 2=south, 3=west
+        # MiniGrid facing:
+        # 0=east, 1=south, 2=west, 3=north
+        #
+        # Project cardinal:
+        # 0=north, 1=east, 2=south, 3=west
         facing_to_cardinal = {
             0: 1,
             1: 2,
@@ -250,16 +302,24 @@ class MiniGridCardinalWrapper:
         cardinal_facing = facing_to_cardinal[facing]
 
         relative_names = []
+
         for action in sorted(self.get_optimal_actions()):
             relative_action = (action - cardinal_facing) % 4
-            relative_names.append(RELATIVE_ACTION_NAMES[relative_action])
+            relative_names.append(
+                RELATIVE_ACTION_NAMES[relative_action]
+            )
 
         return relative_names
 
     def step_cardinal(self, action):
         """
-        Apply direct cardinal action:
-        0=north, 1=east, 2=south, 3=west.
+        Apply a direct cardinal action.
+
+        Actions:
+            0 = north
+            1 = east
+            2 = south
+            3 = west
 
         Returns:
             state, reward, terminated, truncated, info
@@ -269,8 +329,8 @@ class MiniGridCardinalWrapper:
 
         env = self.unwrapped
 
-        old_xy = tuple(env.agent_pos)
-        old_row, old_col = old_xy[1], old_xy[0]
+        old_col = int(env.agent_pos[0])
+        old_row = int(env.agent_pos[1])
 
         dr, dc = ACTION_TO_DELTA[action]
         new_row = old_row + dr
@@ -282,10 +342,11 @@ class MiniGridCardinalWrapper:
         hit_obstacle = blocked and blocked_type == "obstacle"
 
         if not blocked:
-            env.agent_pos = (new_col, new_row)
+            env.agent_pos = (int(new_col), int(new_row))
 
-        # Update facing to match attempted absolute action.
-        # MiniGrid facing: 0=east, 1=south, 2=west, 3=north.
+        # Update facing to match the attempted absolute action.
+        # MiniGrid facing:
+        # 0=east, 1=south, 2=west, 3=north
         action_to_facing = {
             0: 3,
             1: 0,
@@ -301,8 +362,8 @@ class MiniGridCardinalWrapper:
         reward = 10 if terminated else (-2 if blocked else -1)
 
         info = {
-            "hit_wall": hit_wall,
-            "hit_obstacle": hit_obstacle,
+            "hit_wall": bool(hit_wall),
+            "hit_obstacle": bool(hit_obstacle),
             "blocked_type": blocked_type,
             "action_name": ACTION_NAMES[action],
         }
@@ -311,12 +372,20 @@ class MiniGridCardinalWrapper:
 
     def relative_to_cardinal(self, relative_action):
         """
-        Convert egocentric relative action to project cardinal action index.
+        Convert an egocentric relative action into a cardinal action.
 
-        relative_action:
-            0=forward, 1=right, 2=backward, 3=left
+        Relative actions:
+            0 = forward
+            1 = right
+            2 = backward
+            3 = left
         """
-        facing = self.unwrapped.agent_dir
+        if relative_action not in RELATIVE_ACTION_NAMES:
+            raise ValueError(
+                f"Unknown relative action: {relative_action}"
+            )
+
+        facing = int(self.unwrapped.agent_dir)
 
         facing_to_cardinal = {
             0: 1,
@@ -329,38 +398,53 @@ class MiniGridCardinalWrapper:
         return (cardinal_facing + relative_action) % 4
 
     def render_text(self):
+        """
+        Render the complete MiniGrid state as text.
+
+        Symbols:
+            . = free cell
+            X = outer boundary wall
+            # = interior wall
+            G = goal
+            L = lava
+            ? = another object
+            > v < ^ = agent facing direction
+        """
         env = self.unwrapped
         grid = env.grid
-        agent_xy = tuple(env.agent_pos)
-        facing = int(env.agent_dir)
 
+        agent_x = int(env.agent_pos[0])
+        agent_y = int(env.agent_pos[1])
+        agent_xy = (agent_x, agent_y)
+
+        facing = int(env.agent_dir)
         rows = []
 
         for y in range(grid.height):
-            row = []
+            row_symbols = []
 
             for x in range(grid.width):
                 if (x, y) == agent_xy:
-                    row.append(DIRECTION_SYMBOLS[facing])
+                    row_symbols.append(DIRECTION_SYMBOLS[facing])
                     continue
 
                 cell = grid.get(x, y)
 
                 if cell is None:
-                    row.append(".")
+                    row_symbols.append(".")
                 elif cell.type == "goal":
-                    row.append("G")
+                    row_symbols.append("G")
                 elif cell.type == "wall":
                     if self._is_outer_boundary_cell(y, x):
-                        row.append("X")
+                        row_symbols.append("X")
                     else:
-                        row.append("#")
+                        row_symbols.append("#")
                 elif cell.type == "lava":
-                    row.append("L")
+                    row_symbols.append("L")
                 else:
-                    row.append("?")
+                    row_symbols.append("?")
 
-            rows.append(" ".join(row))
+            rows.append(" ".join(row_symbols))
 
         return "\n".join(rows)
 
@@ -372,9 +456,7 @@ class MiniGridCardinalWrapper:
 Grid size: {state["grid_size"][0]} x {state["grid_size"][1]}
 Agent position: {state["agent"]}
 Goal position: {state["goal"]}
-Boundary wall cells: {state["boundary_cells"]}
-Interior wall/obstacle cells: {state["interior_wall_cells"]}
-Other obstacle cells: {state["obstacle_cells"]}
+Obstacle cells: {state["obstacle_cells"]}
 
 Coordinate system:
 - Row 0 is the top (north), and row numbers increase downward (south).
@@ -384,7 +466,7 @@ Choose exactly one action from:
 north, east, south, west
 
 Rules:
-- Do not move into an interior wall or obstacle.
+- Do not move into an obstacle cell.
 - Do not move outside the grid or into the outer boundary.
 - Choose the best next move on a shortest valid path to the goal.
 
@@ -400,9 +482,11 @@ north, east, south, or west
 Grid size: {state["grid_size"][0]} x {state["grid_size"][1]}
 Agent position: {state["agent"]}
 Goal position: {state["goal"]}
-Boundary wall cells: {state["boundary_cells"]}
-Interior wall/obstacle cells: {state["interior_wall_cells"]}
-Other obstacle cells: {state["obstacle_cells"]}
+Obstacle cells: {state["obstacle_cells"]}
+
+Coordinate system:
+- Row 0 is the top (north), and row numbers increase downward (south).
+- Column 0 is the left (west), and column numbers increase to the right (east).
 
 The agent is currently facing {state["facing_name"]}.
 
@@ -416,7 +500,7 @@ Choose exactly one action from:
 forward, right, backward, left
 
 Rules:
-- Do not move into an interior wall or obstacle.
+- Do not move into an obstacle cell.
 - Do not move outside the grid or into the outer boundary.
 - Choose the best next move on a shortest valid path to the goal.
 
@@ -443,8 +527,14 @@ def main():
 
     print("\nOPTIMAL ACTIONS")
     print("=" * 60)
-    print("Optimal allocentric actions:", wrapper.get_optimal_action_names())
-    print("Optimal egocentric actions:", wrapper.get_optimal_relative_action_names())
+    print(
+        "Optimal allocentric actions:",
+        wrapper.get_optimal_action_names(),
+    )
+    print(
+        "Optimal egocentric actions:",
+        wrapper.get_optimal_relative_action_names(),
+    )
 
     print("\nALLOCENTRIC DESCRIPTION")
     print("=" * 60)
