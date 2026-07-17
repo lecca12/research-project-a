@@ -108,7 +108,8 @@ def print_breakdown(title, events, denominator):
 
 
 def main():
-    results = load_results("farama_minigrid_results.json")
+    # results = load_results("farama_minigrid_results.json")
+    results = load_results("farama_minigrid_results_final.json")
     summary = analyze(results)
 
     print("\nFARAMA MINIGRID RESULTS SUMMARY")
