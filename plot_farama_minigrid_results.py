@@ -231,7 +231,8 @@ def main():
     output_dir = Path("plots_farama")
     output_dir.mkdir(exist_ok=True)
 
-    results = load_results("farama_minigrid_results.json")
+    # results = load_results("farama_minigrid_results.json")
+    results = load_results("farama_minigrid_results_final.json")
     summary = summarize(results)
 
     plot_success_by_env(summary, output_dir)
