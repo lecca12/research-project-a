@@ -1,0 +1,254 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: legality_shield
+Mode: allocentric
+Seed: 2
+Reached goal: False
+Early stopped: False
+Steps: 7
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . . . X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 1), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . . . X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 2), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . . . X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east']
+Optimal relative actions: ['forward']
+Legal actions: ['east', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 3), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . . . X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['east', 'south', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 4), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . > . . X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['west']
+Optimal relative actions: ['backward']
+Legal actions: ['east', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 5), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . > . X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['west']
+Optimal relative actions: ['backward']
+Legal actions: ['east', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 6), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . > X
+X # # # . # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south', 'east', 'south']
+Parsed action: None
+Parsed action index: None
+Optimal actions: ['west']
+Optimal relative actions: ['backward']
+Legal actions: ['west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: parse_failure
+Shield used: True
+Shield reprompts: 2
+Reasoning used: False
+Consecutive repeat streak: 0
+Early stop key: None
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+

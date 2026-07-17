@@ -1,0 +1,189 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: baseline
+Mode: allocentric
+Seed: 7
+Reached goal: False
+Early stopped: True
+Steps: 4
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . G . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X # # # # # . # # # # # # # # . # # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # ^ . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['west']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['backward']
+Legal actions: ['north', 'east', 'south']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((14, 10), 3, 3)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . G . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X # # # # # . # # # # # # # # . # # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # < . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['west']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['left']
+Legal actions: ['north', 'east', 'south']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((14, 10), 2, 3)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . G . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X # # # # # . # # # # # # # # . # # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # < . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['west']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['left']
+Legal actions: ['north', 'east', 'south']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 2
+Early stop key: ((14, 10), 2, 3)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . G . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X # # # # # . # # # # # # # # . # # X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # < . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['west']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['south']
+Optimal relative actions: ['left']
+Legal actions: ['north', 'east', 'south']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 3
+Early stop key: ((14, 10), 2, 3)
+Terminated: False
+Truncated: True
+Early stopped: True
+
+================================================================================
+

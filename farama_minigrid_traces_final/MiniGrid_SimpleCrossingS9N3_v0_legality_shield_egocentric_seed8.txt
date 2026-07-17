@@ -1,0 +1,184 @@
+Environment: MiniGrid-SimpleCrossingS9N3-v0
+Policy: legality_shield
+Mode: egocentric
+Seed: 8
+Reached goal: False
+Early stopped: False
+Steps: 5
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > # . . . . . X
+X . # # # # # # X
+X . # . . . . . X
+X . # . . . . . X
+X . # . . . . . X
+X . # # # # # # X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['forward', 'right']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['right']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 1), 0, 2)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . # . . . . . X
+X v # # # # # # X
+X . # . . . . . X
+X . # . . . . . X
+X . # . . . . . X
+X . # # # # # # X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: backward
+All raw answers: ['right', 'backward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: True
+Shield reprompts: 1
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((2, 1), 1, 0)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X ^ # . . . . . X
+X . # # # # # # X
+X . # . . . . . X
+X . # . . . . . X
+X . # . . . . . X
+X . # # # # # # X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: backward
+All raw answers: ['right', 'backward']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['backward']
+Legal actions: ['backward']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 1), 3, 2)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . # . . . . . X
+X v # # # # # # X
+X . # . . . . . X
+X . # . . . . . X
+X . # . . . . . X
+X . # # # # # # X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: backward
+All raw answers: ['right', 'backward']
+Parsed action: north
+Parsed action index: 0
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['backward', 'forward']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: directional_or_detour_error
+Shield used: True
+Shield reprompts: 1
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((2, 1), 1, 0)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X ^ # . . . . . X
+X . # # # # # # X
+X . # . . . . . X
+X . # . . . . . X
+X . # . . . . . X
+X . # # # # # # X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right', 'left', 'right']
+Parsed action: None
+Parsed action index: None
+Optimal actions: ['south']
+Optimal relative actions: ['backward']
+Legal actions: ['backward']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: parse_failure
+Shield used: True
+Shield reprompts: 2
+Reasoning used: False
+Consecutive repeat streak: 0
+Early stop key: None
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+

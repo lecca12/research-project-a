@@ -1,0 +1,54 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: legality_shield
+Mode: egocentric
+Seed: 4
+Reached goal: True
+Early stopped: False
+Steps: 1
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . G v # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['left', 'right']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['west']
+Optimal relative actions: ['right']
+Legal actions: ['backward', 'forward', 'right']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: True
+Shield reprompts: 1
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((11, 8), 1, 3)
+Terminated: True
+Truncated: False
+Early stopped: False
+
+================================================================================
+

@@ -1,0 +1,359 @@
+Environment: MiniGrid-SimpleCrossingS9N2-v0
+Policy: baseline
+Mode: allocentric
+Seed: 3
+Reached goal: False
+Early stopped: True
+Steps: 10
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['east', 'south']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 1), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 2), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 3), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['east', 'south']
+Optimal relative actions: ['forward', 'right']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 4), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . > # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((1, 5), 0, 2)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . v # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Parsed action index: 2
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((2, 5), 1, 2)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . v # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['south']
+Optimal relative actions: ['forward']
+Legal actions: ['north', 'south', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((3, 5), 1, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 7
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . > # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['north', 'south', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((3, 5), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 8
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . > # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['north', 'south', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 2
+Early stop key: ((3, 5), 0, 1)
+Terminated: False
+Truncated: False
+Early stopped: False
+
+================================================================================
+
+STEP 9
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . > # . X
+X . . . . . # . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Parsed action index: 1
+Optimal actions: ['south']
+Optimal relative actions: ['right']
+Legal actions: ['north', 'south', 'west']
+Correct: False
+Hit boundary: False
+Hit obstacle/interior wall: True
+Blocked type: obstacle
+Error type: obstacle_blindness
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 3
+Early stop key: ((3, 5), 0, 1)
+Terminated: False
+Truncated: True
+Early stopped: True
+
+================================================================================
+

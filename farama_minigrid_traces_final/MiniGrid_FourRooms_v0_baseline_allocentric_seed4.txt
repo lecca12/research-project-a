@@ -1,0 +1,54 @@
+Environment: MiniGrid-FourRooms-v0
+Policy: baseline
+Mode: allocentric
+Seed: 4
+Reached goal: True
+Early stopped: False
+Steps: 1
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X X X X X X X X X X X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X # # # # # # # . # # # # # # # # . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . G v # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . . . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X . . . . . . . . # . . . . . . . . X
+X X X X X X X X X X X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['west']
+Parsed action: west
+Parsed action index: 3
+Optimal actions: ['west']
+Optimal relative actions: ['right']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Hit boundary: False
+Hit obstacle/interior wall: False
+Blocked type: None
+Error type: correct
+Shield used: False
+Shield reprompts: 0
+Reasoning used: False
+Consecutive repeat streak: 1
+Early stop key: ((11, 8), 1, 3)
+Terminated: True
+Truncated: False
+Early stopped: False
+
+================================================================================
+
