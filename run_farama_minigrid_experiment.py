@@ -56,11 +56,10 @@ def make_json_safe(obj):
 
 def save_results_incrementally(results, output_path):
     """
-    Save all completed episode results after each episode.
+    Save all completed episode results after every episode.
 
-    A temporary file is written first, then atomically moved into place.
-    This reduces the risk of losing completed results if the experiment
-    is interrupted or a later API request fails.
+    The temporary file is replaced atomically so a late API failure does not
+    discard the episodes that have already completed.
     """
     temporary_path = output_path.with_suffix(".tmp")
 
@@ -76,9 +75,7 @@ def save_results_incrementally(results, output_path):
 
 def parse_action(text, mode, env):
     """
-    Parse baseline and legality-shield responses.
-
-    These policies are instructed to return one action word only.
+    Parse one-word baseline and legality-shield responses.
     """
     word = normalize_answer(text)
 
@@ -102,27 +99,18 @@ def extract_final_action_word(text, mode):
 
     Rules:
     - Answer markers must begin a line.
-    - The action must appear on the same line as the marker.
-    - The final matching marker is used.
-    - If a marker is present but its word is invalid, return None.
-    - Only scan the wider response if no answer marker appears anywhere.
-
-    This prevents a response such as:
-
-        Answer: none
-
-    from being converted into an action word mentioned earlier in the
-    reasoning text.
+    - The action must be on the same line as the marker.
+    - The last marked answer is used.
+    - An invalid marked answer produces a parse failure.
+    - Whole-response fallback scanning is only used when no marker exists.
     """
     if text is None:
         return None
 
     if mode == "allocentric":
         valid_words = set(ABSOLUTE_ACTIONS)
-
     elif mode == "egocentric":
         valid_words = set(RELATIVE_ACTIONS)
-
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
@@ -134,9 +122,7 @@ def extract_final_action_word(text, mode):
         flags=re.IGNORECASE | re.MULTILINE,
     )
 
-    marker_matches = list(
-        marker_pattern.finditer(lowered)
-    )
+    marker_matches = list(marker_pattern.finditer(lowered))
 
     if marker_matches:
         marked_word = normalize_answer(
@@ -148,7 +134,6 @@ def extract_final_action_word(text, mode):
 
         return None
 
-    # Fallback is used only when the response contains no marked answer line.
     words = re.findall(r"[a-z]+", lowered)
 
     for word in reversed(words):
@@ -167,15 +152,12 @@ def parse_reasoning_action(text, mode, env):
     if mode == "allocentric":
         return ABSOLUTE_ACTIONS.get(word)
 
-    if mode == "egocentric":
-        relative_action = RELATIVE_ACTIONS.get(word)
+    relative_action = RELATIVE_ACTIONS.get(word)
 
-        if relative_action is None:
-            return None
+    if relative_action is None:
+        return None
 
-        return env.relative_to_cardinal(relative_action)
-
-    raise ValueError(f"Unknown mode: {mode}")
+    return env.relative_to_cardinal(relative_action)
 
 
 def get_prompt(env, mode):
@@ -196,10 +178,7 @@ def make_reasoning_prompt(base_prompt, mode):
             "south",
             "west",
         ]
-
-        final_options = (
-            "north, east, south, or west"
-        )
+        final_options = "north, east, south, or west"
 
     elif mode == "egocentric":
         action_list = [
@@ -208,10 +187,7 @@ def make_reasoning_prompt(base_prompt, mode):
             "backward",
             "left",
         ]
-
-        final_options = (
-            "forward, right, backward, or left"
-        )
+        final_options = "forward, right, backward, or left"
 
     else:
         raise ValueError(f"Unknown mode: {mode}")
@@ -219,8 +195,7 @@ def make_reasoning_prompt(base_prompt, mode):
     candidate_lines = "\n".join(
         (
             f"- {action}: resulting cell = ?, "
-            f"legal/illegal = ?, "
-            f"shortest-path progress = ?"
+            f"legal/illegal = ?, shortest-path progress = ?"
         )
         for action in action_list
     )
@@ -291,19 +266,13 @@ def get_legal_cardinal_actions(env):
 
 def cardinal_to_relative(action, facing):
     """
-    Convert a project cardinal action to a relative action index.
+    Convert a cardinal action into a relative action index.
 
     MiniGrid facing:
-        0 = east
-        1 = south
-        2 = west
-        3 = north
+        0=east, 1=south, 2=west, 3=north
 
     Project cardinal:
-        0 = north
-        1 = east
-        2 = south
-        3 = west
+        0=north, 1=east, 2=south, 3=west
     """
     facing_to_cardinal = {
         0: 1,
@@ -312,13 +281,8 @@ def cardinal_to_relative(action, facing):
         3: 0,
     }
 
-    cardinal_facing = facing_to_cardinal[
-        int(facing)
-    ]
-
-    return (
-        action - cardinal_facing
-    ) % 4
+    cardinal_facing = facing_to_cardinal[int(facing)]
+    return (action - cardinal_facing) % 4
 
 
 def legal_action_names(env, mode):
@@ -332,7 +296,7 @@ def legal_action_names(env, mode):
 
     if mode == "egocentric":
         facing = env.get_state()["facing"]
-        relative_names = []
+        names = []
 
         for action in sorted(legal_actions):
             relative_action = cardinal_to_relative(
@@ -340,13 +304,11 @@ def legal_action_names(env, mode):
                 facing,
             )
 
-            relative_names.append(
-                RELATIVE_ACTION_NAMES[
-                    relative_action
-                ]
+            names.append(
+                RELATIVE_ACTION_NAMES[relative_action]
             )
 
-        return relative_names
+        return names
 
     raise ValueError(f"Unknown mode: {mode}")
 
@@ -397,18 +359,14 @@ def choose_action(
         return parsed_action, {
             "policy_type": policy_type,
             "raw_model_answer": raw_answer,
-            "all_raw_answers": [
-                raw_answer
-            ],
+            "all_raw_answers": [raw_answer],
             "shield_used": False,
             "shield_reprompts": 0,
             "reasoning_used": False,
             "reasoning_prompt": None,
-            "legal_action_names": (
-                legal_action_names(
-                    env,
-                    mode,
-                )
+            "legal_action_names": legal_action_names(
+                env,
+                mode,
             ),
         }
 
@@ -431,26 +389,19 @@ def choose_action(
         return parsed_action, {
             "policy_type": policy_type,
             "raw_model_answer": raw_answer,
-            "all_raw_answers": [
-                raw_answer
-            ],
+            "all_raw_answers": [raw_answer],
             "shield_used": False,
             "shield_reprompts": 0,
             "reasoning_used": True,
             "reasoning_prompt": reasoning_prompt,
-            "legal_action_names": (
-                legal_action_names(
-                    env,
-                    mode,
-                )
+            "legal_action_names": legal_action_names(
+                env,
+                mode,
             ),
         }
 
     if policy_type == "legality_shield":
-        legal_actions = (
-            get_legal_cardinal_actions(env)
-        )
-
+        legal_actions = get_legal_cardinal_actions(env)
         legal_names = legal_action_names(
             env,
             mode,
@@ -459,16 +410,12 @@ def choose_action(
         all_raw_answers = []
         current_prompt = prompt
 
-        for attempt in range(
-            max_reprompts + 1
-        ):
+        for attempt in range(max_reprompts + 1):
             raw_answer = short_policy_fn(
                 current_prompt
             )
 
-            all_raw_answers.append(
-                raw_answer
-            )
+            all_raw_answers.append(raw_answer)
 
             parsed_action = parse_action(
                 raw_answer,
@@ -482,23 +429,13 @@ def choose_action(
             ):
                 return parsed_action, {
                     "policy_type": policy_type,
-                    "raw_model_answer": (
-                        raw_answer
-                    ),
-                    "all_raw_answers": (
-                        all_raw_answers
-                    ),
-                    "shield_used": (
-                        attempt > 0
-                    ),
-                    "shield_reprompts": (
-                        attempt
-                    ),
+                    "raw_model_answer": raw_answer,
+                    "all_raw_answers": all_raw_answers,
+                    "shield_used": attempt > 0,
+                    "shield_reprompts": attempt,
                     "reasoning_used": False,
                     "reasoning_prompt": None,
-                    "legal_action_names": (
-                        legal_names
-                    ),
+                    "legal_action_names": legal_names,
                 }
 
             current_prompt = make_legality_reprompt(
@@ -507,9 +444,8 @@ def choose_action(
                 legal_names=legal_names,
             )
 
-        # Important safeguard:
-        # If every shield response is invalid or illegal, do not execute the
-        # last proposed action. Returning None produces a parse failure.
+        # The shield must never execute an illegal action.
+        # Exhausting all attempts becomes a parse failure.
         return None, {
             "policy_type": policy_type,
             "raw_model_answer": (
@@ -517,18 +453,12 @@ def choose_action(
                 if all_raw_answers
                 else None
             ),
-            "all_raw_answers": (
-                all_raw_answers
-            ),
+            "all_raw_answers": all_raw_answers,
             "shield_used": True,
-            "shield_reprompts": (
-                max_reprompts
-            ),
+            "shield_reprompts": max_reprompts,
             "reasoning_used": False,
             "reasoning_prompt": None,
-            "legal_action_names": (
-                legal_names
-            ),
+            "legal_action_names": legal_names,
         }
 
     raise ValueError(
@@ -543,28 +473,20 @@ def update_consecutive_repeat_state(
     threshold,
 ):
     """
-    Update the consecutive-repeat streak.
+    Stop only after consecutive repeats of the same state-action key.
 
-    A repeat only counts when the current key is identical to the immediately
-    preceding key.
-
-    Examples:
-        A, A, A -> stop at three
-        A, B, A -> no stop
+    A, A, A -> stop
+    A, B, A -> do not stop
     """
     if threshold is None:
         return False, current_key, 1
 
     if current_key == previous_key:
-        current_streak = (
-            previous_streak + 1
-        )
+        current_streak = previous_streak + 1
     else:
         current_streak = 1
 
-    should_stop = (
-        current_streak >= threshold
-    )
+    should_stop = current_streak >= threshold
 
     return (
         should_stop,
@@ -575,9 +497,7 @@ def update_consecutive_repeat_state(
 
 def save_episode_trace(
     result,
-    output_dir=(
-        "farama_minigrid_traces_s9n1_sanity"
-    ),
+    output_dir="farama_minigrid_traces_final",
 ):
     output_directory = Path(output_dir)
 
@@ -599,170 +519,118 @@ def save_episode_trace(
         f"seed{result['seed']}.txt"
     )
 
-    output_path = (
-        output_directory / filename
-    )
+    output_path = output_directory / filename
 
     with output_path.open(
         "w",
         encoding="utf-8",
     ) as file:
         file.write(
-            f"Environment: "
-            f"{result['env_name']}\n"
+            f"Environment: {result['env_name']}\n"
         )
-
         file.write(
-            f"Policy: "
-            f"{result['policy_type']}\n"
+            f"Policy: {result['policy_type']}\n"
         )
-
         file.write(
-            f"Mode: "
-            f"{result['mode']}\n"
+            f"Mode: {result['mode']}\n"
         )
-
         file.write(
-            f"Seed: "
-            f"{result['seed']}\n"
+            f"Seed: {result['seed']}\n"
         )
-
         file.write(
-            f"Reached goal: "
-            f"{result['reached_goal']}\n"
+            f"Reached goal: {result['reached_goal']}\n"
         )
-
         file.write(
-            f"Early stopped: "
-            f"{result['early_stopped']}\n"
+            f"Early stopped: {result['early_stopped']}\n"
         )
-
         file.write(
-            f"Steps: "
-            f"{result['num_steps']}\n"
+            f"Steps: {result['num_steps']}\n"
         )
+        file.write("=" * 80 + "\n\n")
 
-        file.write(
-            "=" * 80 + "\n\n"
-        )
-
-        for step_log in result[
-            "step_logs"
-        ]:
+        for step_log in result["step_logs"]:
             file.write(
-                f"STEP "
-                f"{step_log['step']}\n"
+                f"STEP {step_log['step']}\n"
             )
-
+            file.write("-" * 80 + "\n")
             file.write(
-                "-" * 80 + "\n"
+                step_log["grid_text"] + "\n\n"
             )
-
-            file.write(
-                step_log["grid_text"]
-                + "\n\n"
-            )
-
             file.write(
                 "Raw answer: "
                 f"{step_log.get('raw_model_answer')}\n"
             )
-
             file.write(
                 "All raw answers: "
                 f"{step_log.get('all_raw_answers')}\n"
             )
-
             file.write(
                 "Parsed action: "
                 f"{step_log.get('parsed_action_name')}\n"
             )
-
             file.write(
                 "Parsed action index: "
                 f"{step_log.get('parsed_action')}\n"
             )
-
             file.write(
                 "Optimal actions: "
                 f"{step_log.get('optimal_action_names')}\n"
             )
-
             file.write(
                 "Optimal relative actions: "
                 f"{step_log.get('optimal_relative_action_names')}\n"
             )
-
             file.write(
                 "Legal actions: "
                 f"{step_log.get('legal_action_names')}\n"
             )
-
             file.write(
-                "Correct: "
-                f"{step_log.get('is_correct')}\n"
+                f"Correct: {step_log.get('is_correct')}\n"
             )
-
             file.write(
-                "Hit boundary: "
-                f"{step_log.get('hit_wall')}\n"
+                f"Hit boundary: {step_log.get('hit_wall')}\n"
             )
-
             file.write(
                 "Hit obstacle/interior wall: "
                 f"{step_log.get('hit_obstacle')}\n"
             )
-
             file.write(
                 "Blocked type: "
                 f"{step_log.get('blocked_type')}\n"
             )
-
             file.write(
                 "Error type: "
                 f"{step_log.get('error_type')}\n"
             )
-
             file.write(
                 "Shield used: "
                 f"{step_log.get('shield_used')}\n"
             )
-
             file.write(
                 "Shield reprompts: "
                 f"{step_log.get('shield_reprompts')}\n"
             )
-
             file.write(
                 "Reasoning used: "
                 f"{step_log.get('reasoning_used')}\n"
             )
-
             file.write(
                 "Consecutive repeat streak: "
                 f"{step_log.get('consecutive_repeat_streak')}\n"
             )
-
             file.write(
                 "Early stop key: "
                 f"{step_log.get('early_stop_repeat_key')}\n"
             )
-
             file.write(
-                "Terminated: "
-                f"{step_log.get('terminated')}\n"
+                f"Terminated: {step_log.get('terminated')}\n"
             )
-
             file.write(
-                "Truncated: "
-                f"{step_log.get('truncated')}\n"
+                f"Truncated: {step_log.get('truncated')}\n"
             )
-
             file.write(
-                "Early stopped: "
-                f"{step_log.get('early_stopped')}\n"
+                f"Early stopped: {step_log.get('early_stopped')}\n"
             )
-
             file.write(
                 "\n" + "=" * 80 + "\n\n"
             )
@@ -794,19 +662,12 @@ def run_episode(
     consecutive_repeat_streak = 0
 
     for step in range(max_steps):
-        prompt = get_prompt(
-            env,
-            mode,
-        )
+        prompt = get_prompt(env, mode)
 
-        optimal_actions = (
-            env.get_optimal_actions()
-        )
-
+        optimal_actions = env.get_optimal_actions()
         optimal_action_names = (
             env.get_optimal_action_names()
         )
-
         optimal_relative_action_names = (
             env.get_optimal_relative_action_names()
         )
@@ -814,64 +675,38 @@ def run_episode(
         grid_text = env.render_text()
         state_before = env.get_state()
 
-        (
-            parsed_action,
-            action_metadata,
-        ) = choose_action(
+        parsed_action, action_metadata = choose_action(
             env=env,
             mode=mode,
             policy_type=policy_type,
             prompt=prompt,
-            short_policy_fn=(
-                short_policy_fn
-            ),
-            reasoning_policy_fn=(
-                reasoning_policy_fn
-            ),
+            short_policy_fn=short_policy_fn,
+            reasoning_policy_fn=reasoning_policy_fn,
         )
 
         raw_answer = action_metadata[
             "raw_model_answer"
         ]
 
-        parse_failure = (
-            parsed_action is None
-        )
+        parse_failure = parsed_action is None
 
         is_correct = (
             not parse_failure
-            and parsed_action
-            in optimal_actions
+            and parsed_action in optimal_actions
         )
 
         if parse_failure:
             step_logs.append({
                 "step": step,
-                "policy_type": (
-                    policy_type
-                ),
-                "agent_pos": (
-                    state_before["agent"]
-                ),
-                "goal_pos": (
-                    state_before["goal"]
-                ),
-                "facing": (
-                    state_before["facing"]
-                ),
-                "facing_name": (
-                    state_before[
-                        "facing_name"
-                    ]
-                ),
-                "raw_model_answer": (
-                    raw_answer
-                ),
-                "all_raw_answers": (
-                    action_metadata[
-                        "all_raw_answers"
-                    ]
-                ),
+                "policy_type": policy_type,
+                "agent_pos": state_before["agent"],
+                "goal_pos": state_before["goal"],
+                "facing": state_before["facing"],
+                "facing_name": state_before["facing_name"],
+                "raw_model_answer": raw_answer,
+                "all_raw_answers": action_metadata[
+                    "all_raw_answers"
+                ],
                 "parsed_action": None,
                 "parsed_action_name": None,
                 "optimal_actions": sorted(
@@ -883,37 +718,25 @@ def run_episode(
                 "optimal_relative_action_names": (
                     optimal_relative_action_names
                 ),
-                "legal_action_names": (
-                    action_metadata[
-                        "legal_action_names"
-                    ]
-                ),
-                "shield_used": (
-                    action_metadata[
-                        "shield_used"
-                    ]
-                ),
-                "shield_reprompts": (
-                    action_metadata[
-                        "shield_reprompts"
-                    ]
-                ),
-                "reasoning_used": (
-                    action_metadata[
-                        "reasoning_used"
-                    ]
-                ),
-                "reasoning_prompt": (
-                    action_metadata[
-                        "reasoning_prompt"
-                    ]
-                ),
+                "legal_action_names": action_metadata[
+                    "legal_action_names"
+                ],
+                "shield_used": action_metadata[
+                    "shield_used"
+                ],
+                "shield_reprompts": action_metadata[
+                    "shield_reprompts"
+                ],
+                "reasoning_used": action_metadata[
+                    "reasoning_used"
+                ],
+                "reasoning_prompt": action_metadata[
+                    "reasoning_prompt"
+                ],
                 "is_valid_format": False,
                 "is_correct": False,
                 "parse_failure": True,
-                "error_type": (
-                    "parse_failure"
-                ),
+                "error_type": "parse_failure",
                 "reward": None,
                 "hit_wall": False,
                 "hit_obstacle": False,
@@ -935,26 +758,18 @@ def run_episode(
             terminated,
             truncated,
             info,
-        ) = env.step_cardinal(
-            parsed_action
-        )
+        ) = env.step_cardinal(parsed_action)
 
         error_type = classify_error(
             parse_failure=False,
             hit_wall=info["hit_wall"],
-            hit_obstacle=(
-                info["hit_obstacle"]
-            ),
+            hit_obstacle=info["hit_obstacle"],
             is_correct=is_correct,
         )
 
         repeat_key = (
-            tuple(
-                state_before["agent"]
-            ),
-            int(
-                state_before["facing"]
-            ),
+            tuple(state_before["agent"]),
+            int(state_before["facing"]),
             int(parsed_action),
         )
 
@@ -963,16 +778,10 @@ def run_episode(
             previous_repeat_key,
             consecutive_repeat_streak,
         ) = update_consecutive_repeat_state(
-            previous_key=(
-                previous_repeat_key
-            ),
-            previous_streak=(
-                consecutive_repeat_streak
-            ),
+            previous_key=previous_repeat_key,
+            previous_streak=consecutive_repeat_streak,
             current_key=repeat_key,
-            threshold=(
-                early_stop_repeats
-            ),
+            threshold=early_stop_repeats,
         )
 
         if stop_now and not terminated:
@@ -982,34 +791,16 @@ def run_episode(
         step_logs.append({
             "step": step,
             "policy_type": policy_type,
-            "agent_pos": (
-                state_before["agent"]
-            ),
-            "goal_pos": (
-                state_before["goal"]
-            ),
-            "facing": (
-                state_before["facing"]
-            ),
-            "facing_name": (
-                state_before[
-                    "facing_name"
-                ]
-            ),
-            "raw_model_answer": (
-                raw_answer
-            ),
-            "all_raw_answers": (
-                action_metadata[
-                    "all_raw_answers"
-                ]
-            ),
-            "parsed_action": (
-                parsed_action
-            ),
-            "parsed_action_name": (
-                info["action_name"]
-            ),
+            "agent_pos": state_before["agent"],
+            "goal_pos": state_before["goal"],
+            "facing": state_before["facing"],
+            "facing_name": state_before["facing_name"],
+            "raw_model_answer": raw_answer,
+            "all_raw_answers": action_metadata[
+                "all_raw_answers"
+            ],
+            "parsed_action": parsed_action,
+            "parsed_action_name": info["action_name"],
             "optimal_actions": sorted(
                 optimal_actions
             ),
@@ -1019,133 +810,78 @@ def run_episode(
             "optimal_relative_action_names": (
                 optimal_relative_action_names
             ),
-            "legal_action_names": (
-                action_metadata[
-                    "legal_action_names"
-                ]
-            ),
-            "shield_used": (
-                action_metadata[
-                    "shield_used"
-                ]
-            ),
-            "shield_reprompts": (
-                action_metadata[
-                    "shield_reprompts"
-                ]
-            ),
-            "reasoning_used": (
-                action_metadata[
-                    "reasoning_used"
-                ]
-            ),
-            "reasoning_prompt": (
-                action_metadata[
-                    "reasoning_prompt"
-                ]
-            ),
+            "legal_action_names": action_metadata[
+                "legal_action_names"
+            ],
+            "shield_used": action_metadata[
+                "shield_used"
+            ],
+            "shield_reprompts": action_metadata[
+                "shield_reprompts"
+            ],
+            "reasoning_used": action_metadata[
+                "reasoning_used"
+            ],
+            "reasoning_prompt": action_metadata[
+                "reasoning_prompt"
+            ],
             "is_valid_format": True,
             "is_correct": is_correct,
             "parse_failure": False,
             "error_type": error_type,
             "reward": reward,
-            "hit_wall": (
-                info["hit_wall"]
-            ),
-            "hit_obstacle": (
-                info["hit_obstacle"]
-            ),
-            "blocked_type": (
-                info["blocked_type"]
-            ),
+            "hit_wall": info["hit_wall"],
+            "hit_obstacle": info["hit_obstacle"],
+            "blocked_type": info["blocked_type"],
             "terminated": terminated,
             "truncated": truncated,
-            "early_stopped": (
-                early_stopped
-            ),
-            "early_stop_repeat_key": (
-                repeat_key
-            ),
+            "early_stopped": early_stopped,
+            "early_stop_repeat_key": repeat_key,
             "consecutive_repeat_streak": (
                 consecutive_repeat_streak
             ),
-            "next_agent_pos": (
-                next_state["agent"]
-            ),
-            "next_facing": (
-                next_state["facing"]
-            ),
-            "next_facing_name": (
-                next_state[
-                    "facing_name"
-                ]
-            ),
+            "next_agent_pos": next_state["agent"],
+            "next_facing": next_state["facing"],
+            "next_facing_name": next_state[
+                "facing_name"
+            ],
             "grid_text": grid_text,
             "prompt": prompt,
         })
 
         if verbose:
-            print(
-                "\n" + "=" * 80
-            )
-
+            print("\n" + "=" * 80)
             print(
                 f"Environment={env_name}, "
                 f"policy={policy_type}, "
-                f"seed={seed}, "
-                f"mode={mode}, "
-                f"step={step}"
+                f"seed={seed}, mode={mode}, step={step}"
             )
-
             print(grid_text)
-
-            print(
-                "Raw answer:",
-                raw_answer,
-            )
-
+            print("Raw answer:", raw_answer)
             print(
                 "Parsed action:",
                 parsed_action,
                 info["action_name"],
             )
-
             print(
                 "Legal actions:",
-                action_metadata[
-                    "legal_action_names"
-                ],
+                action_metadata["legal_action_names"],
             )
-
             print(
                 "Optimal allocentric:",
                 optimal_action_names,
             )
-
             print(
                 "Optimal egocentric:",
                 optimal_relative_action_names,
             )
-
-            print(
-                "Correct:",
-                is_correct,
-            )
-
-            print(
-                "Error:",
-                error_type,
-            )
-
+            print("Correct:", is_correct)
+            print("Error:", error_type)
             print(
                 "Consecutive repeat streak:",
                 consecutive_repeat_streak,
             )
-
-            print(
-                "Early stop:",
-                stop_now,
-            )
+            print("Early stop:", stop_now)
 
         if terminated:
             reached_goal = True
@@ -1165,31 +901,16 @@ def run_episode(
         "num_steps": len(step_logs),
         "reached_goal": reached_goal,
         "early_stopped": early_stopped,
-        "early_stop_repeats": (
-            early_stop_repeats
-        ),
-        "final_state": (
-            final_state["agent"]
-        ),
-        "final_facing": (
-            final_state["facing"]
-        ),
-        "final_facing_name": (
-            final_state[
-                "facing_name"
-            ]
-        ),
+        "early_stop_repeats": early_stop_repeats,
+        "final_state": final_state["agent"],
+        "final_facing": final_state["facing"],
+        "final_facing_name": final_state["facing_name"],
         "max_steps": max_steps,
         "step_logs": step_logs,
     }
 
 
 def test_reasoning_parser():
-    """
-    Local parser sanity checks.
-
-    These do not make API calls.
-    """
     multiline_sample = """The best action is south.
 
 Final answer:
@@ -1197,47 +918,34 @@ Final answer:
 Answer: south
 """
 
-    parsed_multiline = (
-        extract_final_action_word(
-            multiline_sample,
-            "allocentric",
-        )
+    parsed_multiline = extract_final_action_word(
+        multiline_sample,
+        "allocentric",
     )
 
-    assert (
-        parsed_multiline == "south"
-    ), (
-        "Expected parser to extract "
-        "'south' from the marked answer."
-    )
+    assert parsed_multiline == "south"
 
     invalid_marker_sample = """The reasoning discussed west.
 
 Answer: none
 """
 
-    parsed_invalid = (
-        extract_final_action_word(
-            invalid_marker_sample,
-            "allocentric",
-        )
+    parsed_invalid = extract_final_action_word(
+        invalid_marker_sample,
+        "allocentric",
     )
 
-    assert parsed_invalid is None, (
-        "An invalid marked answer must "
-        "produce a parse failure."
-    )
+    assert parsed_invalid is None
 
-    print(
-        "Reasoning parser tests passed."
-    )
+    print("Reasoning parser tests passed.")
 
 
 def main():
-    # Supervisor-requested sanity run:
-    # SimpleCrossing S9N1 with ten paired seeds.
     env_names = [
         "MiniGrid-SimpleCrossingS9N1-v0",
+        "MiniGrid-SimpleCrossingS9N2-v0",
+        "MiniGrid-SimpleCrossingS9N3-v0",
+        "MiniGrid-FourRooms-v0",
     ]
 
     seeds = list(range(10))
@@ -1247,17 +955,17 @@ def main():
         "egocentric",
     ]
 
-    # Rerun only the affected policies.
-    # The previous baseline run is unaffected by the parser and shield fixes.
     policy_types = [
+        "baseline",
         "legality_shield",
         "reasoning",
     ]
 
     max_steps_by_env = {
-        "MiniGrid-SimpleCrossingS9N1-v0": (
-            9 ** 2
-        ),
+        "MiniGrid-SimpleCrossingS9N1-v0": 9 ** 2,
+        "MiniGrid-SimpleCrossingS9N2-v0": 9 ** 2,
+        "MiniGrid-SimpleCrossingS9N3-v0": 9 ** 2,
+        "MiniGrid-FourRooms-v0": 19 ** 2,
     }
 
     early_stop_repeats = 3
@@ -1272,42 +980,30 @@ def main():
     reasoning_max_output_tokens = 1500
 
     output_path = Path(
-        "farama_minigrid_results_s9n1_fixed.json"
+        "farama_minigrid_results_final.json"
     )
 
     metadata_path = Path(
-        "farama_minigrid_results_s9n1_fixed_metadata.json"
+        "farama_minigrid_results_final_metadata.json"
     )
 
     trace_directory = (
-        "farama_minigrid_traces_s9n1_fixed"
+        "farama_minigrid_traces_final"
     )
 
-    short_policy_fn = (
-        make_openai_policy_fn(
-            model=model,
-            temperature=(
-                short_temperature
-            ),
-            max_output_tokens=(
-                short_max_output_tokens
-            ),
-        )
+    short_policy_fn = make_openai_policy_fn(
+        model=model,
+        temperature=short_temperature,
+        max_output_tokens=short_max_output_tokens,
     )
 
-    reasoning_policy_fn = (
-        make_openai_policy_fn(
-            model=model,
-            temperature=(
-                reasoning_temperature
-            ),
-            system_instructions=(
-                REASONING_SYSTEM_INSTRUCTIONS
-            ),
-            max_output_tokens=(
-                reasoning_max_output_tokens
-            ),
-        )
+    reasoning_policy_fn = make_openai_policy_fn(
+        model=model,
+        temperature=reasoning_temperature,
+        system_instructions=(
+            REASONING_SYSTEM_INSTRUCTIONS
+        ),
+        max_output_tokens=reasoning_max_output_tokens,
     )
 
     all_results = []
@@ -1318,35 +1014,22 @@ def main():
     )
 
     metadata = {
-        "run_type": (
-            "s9n1_parser_and_shield_fix"
-        ),
+        "run_type": "full_corrected_farama_benchmark",
         "env_names": env_names,
         "seeds": seeds,
         "num_seeds": len(seeds),
         "modes": modes,
-        "policy_types": (
-            policy_types
-        ),
-        "max_steps_by_env": (
-            max_steps_by_env
-        ),
+        "policy_types": policy_types,
+        "max_steps_by_env": max_steps_by_env,
         "early_stop_rule": (
             "three consecutive identical "
-            "(agent_position, facing, "
-            "parsed_action) keys"
+            "(agent_position, facing, parsed_action) keys"
         ),
-        "early_stop_repeats": (
-            early_stop_repeats
-        ),
+        "early_stop_repeats": early_stop_repeats,
         "save_traces": save_traces,
-        "trace_directory": (
-            trace_directory
-        ),
+        "trace_directory": trace_directory,
         "model": model,
-        "short_temperature": (
-            short_temperature
-        ),
+        "short_temperature": short_temperature,
         "reasoning_temperature": (
             reasoning_temperature
         ),
@@ -1357,12 +1040,9 @@ def main():
             reasoning_max_output_tokens
         ),
         "shield_exhaustion_behavior": (
-            "parse_failure; no illegal "
-            "action is executed"
+            "parse_failure; no illegal action is executed"
         ),
-        "output_file": str(
-            output_path
-        ),
+        "output_file": str(output_path),
     }
 
     with metadata_path.open(
@@ -1376,76 +1056,53 @@ def main():
         )
 
     print(
-        "\nRUNNING OFFICIAL FARAMA "
-        "MINIGRID S9N1 FIXED RUN"
+        "\nRUNNING FULL CORRECTED "
+        "FARAMA MINIGRID BENCHMARK"
     )
-
     print("=" * 80)
     print("Environments:", env_names)
     print("Seeds:", seeds)
     print("Modes:", modes)
-
-    print(
-        "Policy types:",
-        policy_types,
-    )
-
+    print("Policy types:", policy_types)
     print(
         "Early stop repeats:",
         early_stop_repeats,
     )
-
     print(
         "Short temperature:",
         short_temperature,
     )
-
     print(
         "Reasoning temperature:",
         reasoning_temperature,
     )
-
     print(
         "Short max output tokens:",
         short_max_output_tokens,
     )
-
     print(
         "Reasoning max output tokens:",
         reasoning_max_output_tokens,
     )
 
     for env_name in env_names:
-        max_steps = (
-            max_steps_by_env[
-                env_name
-            ]
-        )
+        max_steps = max_steps_by_env[env_name]
 
+        print("\n" + "=" * 80)
         print(
-            "\n" + "=" * 80
-        )
-
-        print(
-            f"ENVIRONMENT: "
-            f"{env_name}, "
+            f"ENVIRONMENT: {env_name}, "
             f"max_steps={max_steps}"
         )
-
         print("=" * 80)
 
         for seed in seeds:
-            print(
-                "\n" + "-" * 80
-            )
-
+            print("\n" + "-" * 80)
             print(f"Seed {seed}")
 
             for policy_type in policy_types:
                 for mode in modes:
                     print(
-                        f"Running "
-                        f"policy={policy_type}, "
+                        f"Running policy={policy_type}, "
                         f"mode={mode}"
                     )
 
@@ -1453,12 +1110,8 @@ def main():
                         env_name=env_name,
                         seed=seed,
                         mode=mode,
-                        policy_type=(
-                            policy_type
-                        ),
-                        short_policy_fn=(
-                            short_policy_fn
-                        ),
+                        policy_type=policy_type,
+                        short_policy_fn=short_policy_fn,
                         reasoning_policy_fn=(
                             reasoning_policy_fn
                         ),
@@ -1469,33 +1122,21 @@ def main():
                         verbose=False,
                     )
 
-                    result["model"] = (
-                        model
-                    )
-
+                    result["model"] = model
                     result[
                         "short_temperature"
                     ] = short_temperature
-
                     result[
                         "reasoning_temperature"
                     ] = reasoning_temperature
-
                     result[
                         "short_max_output_tokens"
-                    ] = (
-                        short_max_output_tokens
-                    )
-
+                    ] = short_max_output_tokens
                     result[
                         "reasoning_max_output_tokens"
-                    ] = (
-                        reasoning_max_output_tokens
-                    )
+                    ] = reasoning_max_output_tokens
 
-                    all_results.append(
-                        result
-                    )
+                    all_results.append(result)
 
                     save_results_incrementally(
                         all_results,
@@ -1505,9 +1146,7 @@ def main():
                     if save_traces:
                         save_episode_trace(
                             result,
-                            output_dir=(
-                                trace_directory
-                            ),
+                            output_dir=trace_directory,
                         )
 
                     print(
@@ -1528,8 +1167,7 @@ def main():
 
     if save_traces:
         print(
-            "- "
-            f"{trace_directory}/"
+            f"- {trace_directory}/"
         )
 
 
