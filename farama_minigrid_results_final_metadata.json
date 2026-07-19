@@ -1,0 +1,48 @@
+{
+  "run_type": "full_corrected_farama_benchmark",
+  "env_names": [
+    "MiniGrid-SimpleCrossingS9N1-v0",
+    "MiniGrid-SimpleCrossingS9N2-v0",
+    "MiniGrid-SimpleCrossingS9N3-v0",
+    "MiniGrid-FourRooms-v0"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "num_seeds": 10,
+  "modes": [
+    "allocentric",
+    "egocentric"
+  ],
+  "policy_types": [
+    "baseline",
+    "legality_shield",
+    "reasoning"
+  ],
+  "max_steps_by_env": {
+    "MiniGrid-SimpleCrossingS9N1-v0": 81,
+    "MiniGrid-SimpleCrossingS9N2-v0": 81,
+    "MiniGrid-SimpleCrossingS9N3-v0": 81,
+    "MiniGrid-FourRooms-v0": 361
+  },
+  "early_stop_rule": "three consecutive identical (agent_position, facing, parsed_action) keys",
+  "early_stop_repeats": 3,
+  "save_traces": true,
+  "trace_directory": "farama_minigrid_traces_final",
+  "model": "gpt-4o-mini",
+  "short_temperature": 0.0,
+  "reasoning_temperature": 0.0,
+  "short_max_output_tokens": 16,
+  "reasoning_max_output_tokens": 1500,
+  "shield_exhaustion_behavior": "parse_failure; no illegal action is executed",
+  "output_file": "farama_minigrid_results_final.json"
+}
