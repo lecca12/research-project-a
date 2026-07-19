@@ -97,12 +97,21 @@ def extract_final_action_word(text, mode):
     """
     Extract the final action from a reasoning response.
 
+    Accepted examples:
+
+        Answer: west
+        **Answer: west**
+        - Answer: west
+        * Answer: west
+        ### Answer: west
+        Final answer: west
+        **Final answer: west**
+
     Rules:
-    - Answer markers must begin a line.
-    - The action must be on the same line as the marker.
-    - The last marked answer is used.
-    - An invalid marked answer produces a parse failure.
-    - Whole-response fallback scanning is only used when no marker exists.
+    - Uses the last explicit answer marker.
+    - Marker may appear in common Markdown formatting.
+    - Invalid marked answers are parse failures.
+    - If no marker exists, return None.
     """
     if text is None:
         return None
@@ -114,31 +123,42 @@ def extract_final_action_word(text, mode):
     else:
         raise ValueError(f"Unknown mode: {mode}")
 
-    lowered = text.strip().lower()
-
     marker_pattern = re.compile(
-        r"^[ \t]*(?:final[ \t]+answer|final[ \t]+action|answer)"
-        r"[ \t]*:[ \t]*([a-z]+)\b",
-        flags=re.IGNORECASE | re.MULTILINE,
+        r"""
+        ^[ \t]*
+        (?:
+            [-*+][ \t]+
+            |
+            \#{1,6}[ \t]+
+        )?
+        (?:\*\*|__)?
+        (?:
+            final[ \t]+answer
+            |
+            final[ \t]+action
+            |
+            answer
+        )
+        (?:\*\*|__)?
+        [ \t]*:[ \t]*
+        (?:\*\*|__)?
+        ([a-z]+)
+        (?:\*\*|__)?
+        [ \t]*[.!]?
+        [ \t]*$
+        """,
+        flags=re.IGNORECASE | re.MULTILINE | re.VERBOSE,
     )
 
-    marker_matches = list(marker_pattern.finditer(lowered))
+    matches = list(marker_pattern.finditer(text))
 
-    if marker_matches:
-        marked_word = normalize_answer(
-            marker_matches[-1].group(1)
-        )
-
-        if marked_word in valid_words:
-            return marked_word
-
+    if not matches:
         return None
 
-    words = re.findall(r"[a-z]+", lowered)
+    word = normalize_answer(matches[-1].group(1))
 
-    for word in reversed(words):
-        if word in valid_words:
-            return word
+    if word in valid_words:
+        return word
 
     return None
 
@@ -911,31 +931,43 @@ def run_episode(
 
 
 def test_reasoning_parser():
-    multiline_sample = """The best action is south.
+    valid_cases = [
+        ("Answer: west", "west"),
+        ("**Answer: west**", "west"),
+        ("- Answer: west", "west"),
+        ("* Answer: west", "west"),
+        ("### Answer: west", "west"),
+        ("Final answer: west", "west"),
+        ("**Final answer: west**", "west"),
+    ]
 
-Final answer:
+    for text, expected in valid_cases:
+        parsed = extract_final_action_word(
+            text,
+            "allocentric",
+        )
 
-Answer: south
-"""
+        assert parsed == expected, (
+            f"Expected {expected}, got {parsed}"
+        )
 
-    parsed_multiline = extract_final_action_word(
-        multiline_sample,
-        "allocentric",
-    )
+    invalid_cases = [
+        "Answer:",
+        "Answer: none",
+        "I considered west first.",
+        "The best move is west.",
+        "Final answer:",
+    ]
 
-    assert parsed_multiline == "south"
+    for text in invalid_cases:
+        parsed = extract_final_action_word(
+            text,
+            "allocentric",
+        )
 
-    invalid_marker_sample = """The reasoning discussed west.
-
-Answer: none
-"""
-
-    parsed_invalid = extract_final_action_word(
-        invalid_marker_sample,
-        "allocentric",
-    )
-
-    assert parsed_invalid is None
+        assert parsed is None, (
+            f"Expected None, got {parsed}"
+        )
 
     print("Reasoning parser tests passed.")
 
