@@ -1,3 +1,4 @@
+import argparse
 import json
 import re
 from pathlib import Path
@@ -97,21 +98,16 @@ def extract_final_action_word(text, mode):
     """
     Extract the final action from a reasoning response.
 
-    Accepted examples:
+    The answer marker must begin a line, but common Markdown formatting is
+    accepted. The parser uses the first valid action word after the marker on
+    the same line. It never scans the rest of the response as a fallback.
 
+    Accepted examples include:
         Answer: west
+        **Answer:** west
         **Answer: west**
         - Answer: west
-        * Answer: west
-        ### Answer: west
-        Final answer: west
-        **Final answer: west**
-
-    Rules:
-    - Uses the last explicit answer marker.
-    - Marker may appear in common Markdown formatting.
-    - Invalid marked answers are parse failures.
-    - If no marker exists, return None.
+        Answer: go west now, not north
     """
     if text is None:
         return None
@@ -126,39 +122,29 @@ def extract_final_action_word(text, mode):
     marker_pattern = re.compile(
         r"""
         ^[ \t]*
-        (?:
-            [-*+][ \t]+
-            |
-            \#{1,6}[ \t]+
-        )?
+        (?:[-*+][ \t]+|\#{1,6}[ \t]+)?
         (?:\*\*|__)?
-        (?:
-            final[ \t]+answer
-            |
-            final[ \t]+action
-            |
-            answer
-        )
+        (?:final[ \t]+answer|final[ \t]+action|answer)
+        [ \t]*
         (?:\*\*|__)?
         [ \t]*:[ \t]*
         (?:\*\*|__)?
-        ([a-z]+)
-        (?:\*\*|__)?
-        [ \t]*[.!]?
-        [ \t]*$
+        (?P<answer_text>[^\r\n]*)
+        $ 
         """,
         flags=re.IGNORECASE | re.MULTILINE | re.VERBOSE,
     )
 
     matches = list(marker_pattern.finditer(text))
-
     if not matches:
         return None
 
-    word = normalize_answer(matches[-1].group(1))
+    answer_text = matches[-1].group("answer_text")
+    words = re.findall(r"[a-z]+", answer_text.lower())
 
-    if word in valid_words:
-        return word
+    for word in words:
+        if word in valid_words:
+            return word
 
     return None
 
@@ -358,6 +344,31 @@ Answer with one word only from:
 """
 
 
+def make_reprompt_control_prompt(
+    original_prompt,
+    raw_answer,
+):
+    """
+    Retry prompt for the matched-reprompt control arm.
+
+    This deliberately withholds the legal-action list so the only difference
+    from the legality shield is the hint content.
+    """
+    return f"""{original_prompt}
+
+Your previous answer was: {raw_answer}
+
+That proposed action is illegal from the current state because it would move
+into an obstacle, the outer boundary, or outside the grid.
+
+The illegal action was not executed.
+
+Choose another action.
+
+Answer with one word only using the action choices from the original prompt.
+"""
+
+
 def choose_action(
     env,
     mode,
@@ -420,7 +431,7 @@ def choose_action(
             ),
         }
 
-    if policy_type == "legality_shield":
+    if policy_type in {"legality_shield", "reprompt_control"}:
         legal_actions = get_legal_cardinal_actions(env)
         legal_names = legal_action_names(
             env,
@@ -431,10 +442,7 @@ def choose_action(
         current_prompt = prompt
 
         for attempt in range(max_reprompts + 1):
-            raw_answer = short_policy_fn(
-                current_prompt
-            )
-
+            raw_answer = short_policy_fn(current_prompt)
             all_raw_answers.append(raw_answer)
 
             parsed_action = parse_action(
@@ -458,14 +466,20 @@ def choose_action(
                     "legal_action_names": legal_names,
                 }
 
-            current_prompt = make_legality_reprompt(
-                original_prompt=prompt,
-                raw_answer=raw_answer,
-                legal_names=legal_names,
-            )
+            if policy_type == "legality_shield":
+                current_prompt = make_legality_reprompt(
+                    original_prompt=prompt,
+                    raw_answer=raw_answer,
+                    legal_names=legal_names,
+                )
+            else:
+                current_prompt = make_reprompt_control_prompt(
+                    original_prompt=prompt,
+                    raw_answer=raw_answer,
+                )
 
-        # The shield must never execute an illegal action.
-        # Exhausting all attempts becomes a parse failure.
+        # Neither intervention arm ever executes an illegal action.
+        # Exhausting the shared retry budget becomes a parse failure.
         return None, {
             "policy_type": policy_type,
             "raw_model_answer": (
@@ -933,12 +947,12 @@ def run_episode(
 def test_reasoning_parser():
     valid_cases = [
         ("Answer: west", "west"),
+        ("**Answer:** west", "west"),
         ("**Answer: west**", "west"),
         ("- Answer: west", "west"),
-        ("* Answer: west", "west"),
         ("### Answer: west", "west"),
         ("Final answer: west", "west"),
-        ("**Final answer: west**", "west"),
+        ("Answer: go west now, not north", "west"),
     ]
 
     for text, expected in valid_cases:
@@ -946,9 +960,8 @@ def test_reasoning_parser():
             text,
             "allocentric",
         )
-
         assert parsed == expected, (
-            f"Expected {expected}, got {parsed}"
+            f"Expected {expected}, got {parsed}: {text!r}"
         )
 
     invalid_cases = [
@@ -964,34 +977,106 @@ def test_reasoning_parser():
             text,
             "allocentric",
         )
-
         assert parsed is None, (
-            f"Expected None, got {parsed}"
+            f"Expected None, got {parsed}: {text!r}"
         )
 
     print("Reasoning parser tests passed.")
 
 
-def main():
-    env_names = [
-        "MiniGrid-SimpleCrossingS9N1-v0",
-        "MiniGrid-SimpleCrossingS9N2-v0",
-        "MiniGrid-SimpleCrossingS9N3-v0",
-        "MiniGrid-FourRooms-v0",
-    ]
+def parse_csv_or_space_values(values):
+    parsed = []
+    for value in values:
+        parsed.extend(
+            item.strip()
+            for item in value.split(",")
+            if item.strip()
+        )
+    return parsed
 
-    seeds = list(range(10))
+
+def parse_seed_spec(values):
+    """Parse seed lists such as 0 1 2, 0,1,2, or ranges such as 0-9."""
+    seeds = []
+    for token in parse_csv_or_space_values(values):
+        range_match = re.fullmatch(r"(-?\d+)-(-?\d+)", token)
+        if range_match:
+            start = int(range_match.group(1))
+            end = int(range_match.group(2))
+            step = 1 if end >= start else -1
+            seeds.extend(range(start, end + step, step))
+        else:
+            seeds.append(int(token))
+
+    # Preserve requested order while removing duplicates.
+    return list(dict.fromkeys(seeds))
+
+
+def build_argument_parser():
+    parser = argparse.ArgumentParser(
+        description="Run split Farama MiniGrid benchmark chunks."
+    )
+    parser.add_argument(
+        "--seeds",
+        nargs="+",
+        default=["0-9"],
+        help="Seed range/list, e.g. 0-9, 0,2,4, or 0 1 2.",
+    )
+    parser.add_argument(
+        "--arms",
+        nargs="+",
+        default=[
+            "baseline",
+            "legality_shield",
+            "reprompt_control",
+            "reasoning",
+        ],
+        help="Arms separated by spaces or commas.",
+    )
+    parser.add_argument(
+        "--environments",
+        nargs="+",
+        default=[
+            "MiniGrid-SimpleCrossingS9N1-v0",
+            "MiniGrid-SimpleCrossingS9N2-v0",
+            "MiniGrid-SimpleCrossingS9N3-v0",
+            "MiniGrid-FourRooms-v0",
+        ],
+        help="Environment IDs separated by spaces or commas.",
+    )
+    parser.add_argument(
+        "--output",
+        default="farama_minigrid_results_final.json",
+        help="Unique JSON output filename for this chunk.",
+    )
+    return parser
+
+
+def main():
+    args = build_argument_parser().parse_args()
+
+    env_names = parse_csv_or_space_values(args.environments)
+    seeds = parse_seed_spec(args.seeds)
 
     modes = [
         "allocentric",
         "egocentric",
     ]
 
-    policy_types = [
+    policy_types = parse_csv_or_space_values(args.arms)
+
+    valid_policy_types = {
         "baseline",
         "legality_shield",
+        "reprompt_control",
         "reasoning",
-    ]
+    }
+    unknown_policy_types = set(policy_types) - valid_policy_types
+    if unknown_policy_types:
+        raise ValueError(
+            "Unknown arms: "
+            + ", ".join(sorted(unknown_policy_types))
+        )
 
     max_steps_by_env = {
         "MiniGrid-SimpleCrossingS9N1-v0": 9 ** 2,
@@ -1011,17 +1096,11 @@ def main():
     short_max_output_tokens = 16
     reasoning_max_output_tokens = 1500
 
-    output_path = Path(
-        "farama_minigrid_results_final.json"
+    output_path = Path(args.output)
+    metadata_path = output_path.with_name(
+        f"{output_path.stem}_metadata.json"
     )
-
-    metadata_path = Path(
-        "farama_minigrid_results_final_metadata.json"
-    )
-
-    trace_directory = (
-        "farama_minigrid_traces_final"
-    )
+    trace_directory = f"{output_path.stem}_traces"
 
     short_policy_fn = make_openai_policy_fn(
         model=model,
@@ -1038,6 +1117,9 @@ def main():
         max_output_tokens=reasoning_max_output_tokens,
     )
 
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    metadata_path.parent.mkdir(parents=True, exist_ok=True)
+
     all_results = []
 
     save_results_incrementally(
@@ -1046,7 +1128,7 @@ def main():
     )
 
     metadata = {
-        "run_type": "full_corrected_farama_benchmark",
+        "run_type": "split_full_farama_benchmark",
         "env_names": env_names,
         "seeds": seeds,
         "num_seeds": len(seeds),
@@ -1071,7 +1153,16 @@ def main():
         "reasoning_max_output_tokens": (
             reasoning_max_output_tokens
         ),
-        "shield_exhaustion_behavior": (
+        "intervention_arms": {
+            "legality_shield": (
+                "two-reprompt budget; reprompt lists legal actions"
+            ),
+            "reprompt_control": (
+                "two-reprompt budget; reprompt does not list legal actions"
+            ),
+        },
+        "max_reprompts": 2,
+        "intervention_exhaustion_behavior": (
             "parse_failure; no illegal action is executed"
         ),
         "output_file": str(output_path),
