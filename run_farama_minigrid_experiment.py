@@ -1045,6 +1045,26 @@ def build_argument_parser():
         help="Environment IDs separated by spaces or commas.",
     )
     parser.add_argument(
+        "--model",
+        default="openai/gpt-4o-mini",
+        help=(
+            "OpenRouter model ID, for example openai/gpt-4.1-mini or "
+            "anthropic/claude-haiku-4.5. Recorded verbatim in the run "
+            "metadata."
+        ),
+    )
+
+    parser.add_argument(
+        "--provider",
+        default=None,
+        help=(
+            "Optional OpenRouter upstream provider to pin, for example "
+            "OpenAI or Anthropic. When set, all calls hit that one upstream. "
+            "Recorded in the run metadata."
+        ),
+    )
+
+    parser.add_argument(
         "--output",
         default="farama_minigrid_results_final.json",
         help="Unique JSON output filename for this chunk.",
@@ -1088,7 +1108,8 @@ def main():
     early_stop_repeats = 3
     save_traces = True
 
-    model = "gpt-4o-mini"
+    model = args.model
+    provider_pin = args.provider
 
     short_temperature = 0.0
     reasoning_temperature = 0.0
@@ -1106,6 +1127,7 @@ def main():
         model=model,
         temperature=short_temperature,
         max_output_tokens=short_max_output_tokens,
+        provider=provider_pin,
     )
 
     reasoning_policy_fn = make_openai_policy_fn(
@@ -1115,6 +1137,7 @@ def main():
             REASONING_SYSTEM_INSTRUCTIONS
         ),
         max_output_tokens=reasoning_max_output_tokens,
+        provider=provider_pin,
     )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1143,6 +1166,7 @@ def main():
         "save_traces": save_traces,
         "trace_directory": trace_directory,
         "model": model,
+        "provider_pin": provider_pin,
         "short_temperature": short_temperature,
         "reasoning_temperature": (
             reasoning_temperature
