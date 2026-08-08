@@ -5,6 +5,11 @@ from typing import Callable
 from openai import OpenAI
 
 
+# OpenRouter exposes an OpenAI-compatible API, including the Responses
+# endpoint used below, so only the base URL and the key source change.
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+
 DEFAULT_SYSTEM_INSTRUCTIONS = (
     "You are a precise navigation assistant for a grid world experiment. "
     "Return exactly one allowed action word and nothing else. "
@@ -20,6 +25,7 @@ def make_openai_policy_fn(
     model: str = "gpt-4o-mini",
     temperature: float | None = 0.0,
     api_key: str | None = None,
+    provider: str | None = None,
     system_instructions: str = DEFAULT_SYSTEM_INSTRUCTIONS,
     max_output_tokens: int = 16,
     max_retries: int = 3,
@@ -41,8 +47,13 @@ def make_openai_policy_fn(
         request. This supports models that reject custom temperature values.
 
     api_key:
-        Optional explicit API key. When omitted, OPENAI_API_KEY is read from
-        the environment.
+        Optional explicit API key. When omitted, OPENROUTER_API_KEY is read
+        from the environment.
+
+    provider:
+        Optional OpenRouter upstream provider name (for example "OpenAI" or
+        "Anthropic"). When set, routing is pinned to that provider with
+        fallbacks disabled, so every call for a model hits one upstream.
 
     system_instructions:
         Instructions supplied separately from the user prompt.
@@ -59,11 +70,11 @@ def make_openai_policy_fn(
     request_delay:
         Small delay before each API request to reduce rapid request bursts.
     """
-    resolved_key = api_key or os.environ.get("OPENAI_API_KEY")
+    resolved_key = api_key or os.environ.get("OPENROUTER_API_KEY")
 
     if not resolved_key:
         raise OpenAIPolicyError(
-            "OPENAI_API_KEY is not set. "
+            "OPENROUTER_API_KEY is not set. "
             "Set it in the current shell before running the experiment."
         )
 
@@ -76,7 +87,10 @@ def make_openai_policy_fn(
     if request_delay < 0:
         raise ValueError("request_delay must be zero or greater.")
 
-    client = OpenAI(api_key=resolved_key)
+    client = OpenAI(
+        api_key=resolved_key,
+        base_url=OPENROUTER_BASE_URL,
+    )
 
     def policy_fn(prompt: str) -> str:
         if not isinstance(prompt, str) or not prompt.strip():
@@ -95,6 +109,20 @@ def make_openai_policy_fn(
         # temperature is None lets each runner choose the appropriate setup.
         if temperature is not None:
             request_kwargs["temperature"] = temperature
+
+        # Pin OpenRouter upstream routing when a provider is named, so every
+        # call for a model hits the same upstream (for example Anthropic
+        # rather than Amazon Bedrock, which OpenRouter would otherwise pick
+        # for some Anthropic models). Fallbacks stay disabled for
+        # reproducibility; transient upstream errors are handled by the retry
+        # loop below.
+        if provider is not None:
+            request_kwargs["extra_body"] = {
+                "provider": {
+                    "order": [provider],
+                    "allow_fallbacks": False,
+                }
+            }
 
         total_attempts = max_retries + 1
         last_exception = None
