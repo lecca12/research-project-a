@@ -1,0 +1,152 @@
+diff --git a/llm_policy.py b/llm_policy.py
+index 1a3a45d..35419c3 100644
+--- a/llm_policy.py
++++ b/llm_policy.py
+@@ -5,6 +5,11 @@ from typing import Callable
+ from openai import OpenAI
+ 
+ 
++# OpenRouter exposes an OpenAI-compatible API, including the Responses
++# endpoint used below, so only the base URL and the key source change.
++OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
++
++
+ DEFAULT_SYSTEM_INSTRUCTIONS = (
+     "You are a precise navigation assistant for a grid world experiment. "
+     "Return exactly one allowed action word and nothing else. "
+@@ -20,6 +25,7 @@ def make_openai_policy_fn(
+     model: str = "gpt-4o-mini",
+     temperature: float | None = 0.0,
+     api_key: str | None = None,
++    provider: str | None = None,
+     system_instructions: str = DEFAULT_SYSTEM_INSTRUCTIONS,
+     max_output_tokens: int = 16,
+     max_retries: int = 3,
+@@ -41,8 +47,13 @@ def make_openai_policy_fn(
+         request. This supports models that reject custom temperature values.
+ 
+     api_key:
+-        Optional explicit API key. When omitted, OPENAI_API_KEY is read from
+-        the environment.
++        Optional explicit API key. When omitted, OPENROUTER_API_KEY is read
++        from the environment.
++
++    provider:
++        Optional OpenRouter upstream provider name (for example "OpenAI" or
++        "Anthropic"). When set, routing is pinned to that provider with
++        fallbacks disabled, so every call for a model hits one upstream.
+ 
+     system_instructions:
+         Instructions supplied separately from the user prompt.
+@@ -59,11 +70,11 @@ def make_openai_policy_fn(
+     request_delay:
+         Small delay before each API request to reduce rapid request bursts.
+     """
+-    resolved_key = api_key or os.environ.get("OPENAI_API_KEY")
++    resolved_key = api_key or os.environ.get("OPENROUTER_API_KEY")
+ 
+     if not resolved_key:
+         raise OpenAIPolicyError(
+-            "OPENAI_API_KEY is not set. "
++            "OPENROUTER_API_KEY is not set. "
+             "Set it in the current shell before running the experiment."
+         )
+ 
+@@ -76,7 +87,10 @@ def make_openai_policy_fn(
+     if request_delay < 0:
+         raise ValueError("request_delay must be zero or greater.")
+ 
+-    client = OpenAI(api_key=resolved_key)
++    client = OpenAI(
++        api_key=resolved_key,
++        base_url=OPENROUTER_BASE_URL,
++    )
+ 
+     def policy_fn(prompt: str) -> str:
+         if not isinstance(prompt, str) or not prompt.strip():
+@@ -96,6 +110,20 @@ def make_openai_policy_fn(
+         if temperature is not None:
+             request_kwargs["temperature"] = temperature
+ 
++        # Pin OpenRouter upstream routing when a provider is named, so every
++        # call for a model hits the same upstream (for example Anthropic
++        # rather than Amazon Bedrock, which OpenRouter would otherwise pick
++        # for some Anthropic models). Fallbacks stay disabled for
++        # reproducibility; transient upstream errors are handled by the retry
++        # loop below.
++        if provider is not None:
++            request_kwargs["extra_body"] = {
++                "provider": {
++                    "order": [provider],
++                    "allow_fallbacks": False,
++                }
++            }
++
+         total_attempts = max_retries + 1
+         last_exception = None
+ 
+diff --git a/run_farama_minigrid_experiment.py b/run_farama_minigrid_experiment.py
+index efe73fc..dff66af 100644
+--- a/run_farama_minigrid_experiment.py
++++ b/run_farama_minigrid_experiment.py
+@@ -1044,6 +1044,26 @@ def build_argument_parser():
+         ],
+         help="Environment IDs separated by spaces or commas.",
+     )
++    parser.add_argument(
++        "--model",
++        default="openai/gpt-4o-mini",
++        help=(
++            "OpenRouter model ID, for example openai/gpt-4.1-mini or "
++            "anthropic/claude-haiku-4.5. Recorded verbatim in the run "
++            "metadata."
++        ),
++    )
++
++    parser.add_argument(
++        "--provider",
++        default=None,
++        help=(
++            "Optional OpenRouter upstream provider to pin, for example "
++            "OpenAI or Anthropic. When set, all calls hit that one upstream. "
++            "Recorded in the run metadata."
++        ),
++    )
++
+     parser.add_argument(
+         "--output",
+         default="farama_minigrid_results_final.json",
+@@ -1088,7 +1108,8 @@ def main():
+     early_stop_repeats = 3
+     save_traces = True
+ 
+-    model = "gpt-4o-mini"
++    model = args.model
++    provider_pin = args.provider
+ 
+     short_temperature = 0.0
+     reasoning_temperature = 0.0
+@@ -1106,6 +1127,7 @@ def main():
+         model=model,
+         temperature=short_temperature,
+         max_output_tokens=short_max_output_tokens,
++        provider=provider_pin,
+     )
+ 
+     reasoning_policy_fn = make_openai_policy_fn(
+@@ -1115,6 +1137,7 @@ def main():
+             REASONING_SYSTEM_INSTRUCTIONS
+         ),
+         max_output_tokens=reasoning_max_output_tokens,
++        provider=provider_pin,
+     )
+ 
+     output_path.parent.mkdir(parents=True, exist_ok=True)
+@@ -1143,6 +1166,7 @@ def main():
+         "save_traces": save_traces,
+         "trace_directory": trace_directory,
+         "model": model,
++        "provider_pin": provider_pin,
+         "short_temperature": short_temperature,
+         "reasoning_temperature": (
+             reasoning_temperature
