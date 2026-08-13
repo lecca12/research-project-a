@@ -569,17 +569,10 @@ class GazeboGridWorld:
             == self.goal_cell
         )
 
-    def make_allocentric_description(
-        self,
-    ):
-        """
-        Allocentric prompt matching the existing grid-navigation format.
-        """
-        state = (
-            self.get_state()
-        )
+    def make_allocentric_description(self):
+        state = self.get_state()
 
-        return f"""You are navigating a grid world.
+        return f"""You are navigating a MiniGrid environment.
 
 Grid size: {self.rows} x {self.cols}
 Agent position: {state["agent"]}
@@ -595,44 +588,42 @@ north, east, south, west
 
 Rules:
 - Do not move into an obstacle cell.
-- Do not move outside the grid.
-- Choose the best next move toward the goal.
+- Do not move outside the grid or into the outer boundary.
+- Choose the best next move on a shortest valid path to the goal.
 
 Answer with one word only:
 north, east, south, or west
 """
 
-    def make_egocentric_description(
-        self,
-    ):
-        """
-        Egocentric prompt matching the existing relative-action format.
-        """
-        state = (
-            self.get_state()
-        )
+    def make_egocentric_description(self):
+        state = self.get_state()
 
-        return f"""You are navigating a grid world.
+        return f"""You are navigating a MiniGrid environment.
 
 Grid size: {self.rows} x {self.cols}
 Agent position: {state["agent"]}
 Goal position: {state["goal"]}
-Facing direction: {state["facing"]}
 Obstacle cells: {sorted(self.obstacle_cells)}
 
 Coordinate system:
 - Row 0 is the top (north), and row numbers increase downward (south).
 - Column 0 is the left (west), and column numbers increase to the right (east).
 
+The agent is currently facing {state["facing"]}.
+
+Relative actions:
+- forward: move in the direction you are facing
+- right: turn right relative to your current facing and move
+- backward: turn around and move
+- left: turn left relative to your current facing and move
+
 Choose exactly one action from:
 forward, right, backward, left
 
-Interpret those actions relative to the current facing direction.
-
 Rules:
 - Do not move into an obstacle cell.
-- Do not move outside the grid.
-- Choose the best next move toward the goal.
+- Do not move outside the grid or into the outer boundary.
+- Choose the best next move on a shortest valid path to the goal.
 
 Answer with one word only:
 forward, right, backward, or left

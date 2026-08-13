@@ -1,0 +1,1755 @@
+{
+  "environment_type": "gazebo_turtlebot3",
+  "policy_type": "legality_shield",
+  "mode": "egocentric",
+  "rows": 5,
+  "cols": 5,
+  "cell_size": 0.5,
+  "start_cell": [
+    4,
+    0
+  ],
+  "goal_cell": [
+    0,
+    4
+  ],
+  "obstacle_cells": [
+    [
+      2,
+      2
+    ],
+    [
+      3,
+      2
+    ]
+  ],
+  "max_steps": 20,
+  "num_steps": 20,
+  "reached_goal": false,
+  "retry_budget_exhausted": false,
+  "initial_state": {
+    "agent": [
+      4,
+      0
+    ],
+    "goal": [
+      0,
+      4
+    ],
+    "facing": "east",
+    "pose": {
+      "x": 5.818248394115535e-05,
+      "y": -9.941294639488378e-07,
+      "yaw": 8.93913784105148e-07,
+      "yaw_degrees": 5.1217487077793634e-05
+    }
+  },
+  "final_state": {
+    "agent": [
+      3,
+      1
+    ],
+    "goal": [
+      0,
+      4
+    ],
+    "facing": "south",
+    "pose": {
+      "x": 0.47456957083279017,
+      "y": 0.5226532515831762,
+      "yaw": -1.560794875697677,
+      "yaw_degrees": -89.42695906312284
+    }
+  },
+  "step_logs": [
+    {
+      "step": 0,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        4,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 5.818248394115535e-05,
+        "y": -9.941294639488378e-07,
+        "yaw": 8.93913784105148e-07,
+        "yaw_degrees": 5.1217487077793634e-05
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (4, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "right",
+        "forward"
+      ],
+      "parsed_action": "east",
+      "legal_action_names": [
+        "forward",
+        "left"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 1,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "east",
+        "from_cell": [
+          4,
+          0
+        ],
+        "intended_cell": [
+          4,
+          1
+        ],
+        "final_cell": [
+          4,
+          1
+        ],
+        "before_pose": {
+          "x": 5.818248394115535e-05,
+          "y": -9.941294639488378e-07,
+          "yaw": 8.93913784105148e-07,
+          "yaw_degrees": 5.1217487077793634e-05
+        },
+        "after_pose": {
+          "x": 0.4706152235345116,
+          "y": -1.4815517990136164e-06,
+          "yaw": 4.160218577818779e-06,
+          "yaw_degrees": 0.00023836296636093368
+        }
+      },
+      "state_after": {
+        "agent": [
+          4,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "east",
+        "pose": {
+          "x": 0.4706152235345116,
+          "y": -1.4815517990136164e-06,
+          "yaw": 4.160218577818779e-06,
+          "yaw_degrees": 0.00023836296636093368
+        }
+      }
+    },
+    {
+      "step": 1,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        4,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 0.4706152235345116,
+        "y": -1.4815517990136164e-06,
+        "yaw": 4.160218577818779e-06,
+        "yaw_degrees": 0.00023836296636093368
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (4, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": "east",
+      "legal_action_names": [
+        "forward",
+        "left",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "east",
+        "from_cell": [
+          4,
+          1
+        ],
+        "intended_cell": [
+          4,
+          2
+        ],
+        "final_cell": [
+          4,
+          2
+        ],
+        "before_pose": {
+          "x": 0.4706152235345116,
+          "y": -1.4815517990136164e-06,
+          "yaw": 4.160218577818779e-06,
+          "yaw_degrees": 0.00023836296636093368
+        },
+        "after_pose": {
+          "x": 0.9551173233054918,
+          "y": -2.1712329758309583e-06,
+          "yaw": 3.773962527883461e-06,
+          "yaw_degrees": 0.0002162321248882456
+        }
+      },
+      "state_after": {
+        "agent": [
+          4,
+          2
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "east",
+        "pose": {
+          "x": 0.9551173233054918,
+          "y": -2.1712329758309583e-06,
+          "yaw": 3.773962527883461e-06,
+          "yaw_degrees": 0.0002162321248882456
+        }
+      }
+    },
+    {
+      "step": 2,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        4,
+        2
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 0.9551173233054918,
+        "y": -2.1712329758309583e-06,
+        "yaw": 3.773962527883461e-06,
+        "yaw_degrees": 0.0002162321248882456
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (4, 2)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "backward",
+      "all_raw_answers": [
+        "right",
+        "backward"
+      ],
+      "parsed_action": "west",
+      "legal_action_names": [
+        "forward",
+        "backward"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 1,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "west",
+        "from_cell": [
+          4,
+          2
+        ],
+        "intended_cell": [
+          4,
+          1
+        ],
+        "final_cell": [
+          4,
+          1
+        ],
+        "before_pose": {
+          "x": 0.9551173233054918,
+          "y": -2.1712329758309583e-06,
+          "yaw": 3.773962527883461e-06,
+          "yaw_degrees": 0.0002162321248882456
+        },
+        "after_pose": {
+          "x": 0.49880562409855395,
+          "y": 0.004484552116704426,
+          "yaw": 3.124028050958342,
+          "yaw_degrees": 178.99362240039346
+        }
+      },
+      "state_after": {
+        "agent": [
+          4,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "west",
+        "pose": {
+          "x": 0.49880562409855395,
+          "y": 0.004484552116704426,
+          "yaw": 3.124028050958342,
+          "yaw_degrees": 178.99362240039346
+        }
+      }
+    },
+    {
+      "step": 3,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        4,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "west",
+      "pose_before": {
+        "x": 0.49880562409855395,
+        "y": 0.004484552116704426,
+        "yaw": 3.124028050958342,
+        "yaw_degrees": 178.99362240039346
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (4, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing west.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "north",
+      "legal_action_names": [
+        "backward",
+        "right",
+        "forward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "north",
+        "from_cell": [
+          4,
+          1
+        ],
+        "intended_cell": [
+          3,
+          1
+        ],
+        "final_cell": [
+          3,
+          1
+        ],
+        "before_pose": {
+          "x": 0.49880562409855395,
+          "y": 0.004484552116704426,
+          "yaw": 3.124028050958342,
+          "yaw_degrees": 178.99362240039346
+        },
+        "after_pose": {
+          "x": 0.47820435426177066,
+          "y": 0.47700226942649226,
+          "yaw": 1.5807428331452427,
+          "yaw_degrees": 90.5698928347749
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "north",
+        "pose": {
+          "x": 0.47820435426177066,
+          "y": 0.47700226942649226,
+          "yaw": 1.5807428331452427,
+          "yaw_degrees": 90.5698928347749
+        }
+      }
+    },
+    {
+      "step": 4,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "north",
+      "pose_before": {
+        "x": 0.47820435426177066,
+        "y": 0.47700226942649226,
+        "yaw": 1.5807428331452427,
+        "yaw_degrees": 90.5698928347749
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing north.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "left",
+      "all_raw_answers": [
+        "left"
+      ],
+      "parsed_action": "west",
+      "legal_action_names": [
+        "forward",
+        "backward",
+        "left"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "west",
+        "from_cell": [
+          3,
+          1
+        ],
+        "intended_cell": [
+          3,
+          0
+        ],
+        "final_cell": [
+          3,
+          0
+        ],
+        "before_pose": {
+          "x": 0.47820435426177066,
+          "y": 0.47700226942649226,
+          "yaw": 1.5807428331452427,
+          "yaw_degrees": 90.5698928347749
+        },
+        "after_pose": {
+          "x": 0.00956465324852336,
+          "y": 0.49756359456420535,
+          "yaw": 3.123835649818524,
+          "yaw_degrees": 178.9825986271084
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "west",
+        "pose": {
+          "x": 0.00956465324852336,
+          "y": 0.49756359456420535,
+          "yaw": 3.123835649818524,
+          "yaw_degrees": 178.9825986271084
+        }
+      }
+    },
+    {
+      "step": 5,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "west",
+      "pose_before": {
+        "x": 0.00956465324852336,
+        "y": 0.49756359456420535,
+        "yaw": 3.123835649818524,
+        "yaw_degrees": 178.9825986271084
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing west.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "north",
+      "legal_action_names": [
+        "backward",
+        "right",
+        "left"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "north",
+        "from_cell": [
+          3,
+          0
+        ],
+        "intended_cell": [
+          2,
+          0
+        ],
+        "final_cell": [
+          2,
+          0
+        ],
+        "before_pose": {
+          "x": 0.00956465324852336,
+          "y": 0.49756359456420535,
+          "yaw": 3.123835649818524,
+          "yaw_degrees": 178.9825986271084
+        },
+        "after_pose": {
+          "x": -0.01108244505890579,
+          "y": 0.9700834613658551,
+          "yaw": 1.5808378363186035,
+          "yaw_degrees": 90.57533611564882
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "north",
+        "pose": {
+          "x": -0.01108244505890579,
+          "y": 0.9700834613658551,
+          "yaw": 1.5808378363186035,
+          "yaw_degrees": 90.57533611564882
+        }
+      }
+    },
+    {
+      "step": 6,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "north",
+      "pose_before": {
+        "x": -0.01108244505890579,
+        "y": 0.9700834613658551,
+        "yaw": 1.5808378363186035,
+        "yaw_degrees": 90.57533611564882
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing north.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "east",
+      "legal_action_names": [
+        "right",
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "east",
+        "from_cell": [
+          2,
+          0
+        ],
+        "intended_cell": [
+          2,
+          1
+        ],
+        "final_cell": [
+          2,
+          1
+        ],
+        "before_pose": {
+          "x": -0.01108244505890579,
+          "y": 0.9700834613658551,
+          "yaw": 1.5808378363186035,
+          "yaw_degrees": 90.57533611564882
+        },
+        "after_pose": {
+          "x": 0.46094805416633805,
+          "y": 0.9957332799210921,
+          "yaw": 0.0205592838280871,
+          "yaw_degrees": 1.1779601931609576
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "east",
+        "pose": {
+          "x": 0.46094805416633805,
+          "y": 0.9957332799210921,
+          "yaw": 0.0205592838280871,
+          "yaw_degrees": 1.1779601931609576
+        }
+      }
+    },
+    {
+      "step": 7,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 0.46094805416633805,
+        "y": 0.9957332799210921,
+        "yaw": 0.0205592838280871,
+        "yaw_degrees": 1.1779601931609576
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "forward",
+        "right"
+      ],
+      "parsed_action": "south",
+      "legal_action_names": [
+        "left",
+        "right",
+        "backward"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 1,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "south",
+        "from_cell": [
+          2,
+          1
+        ],
+        "intended_cell": [
+          3,
+          1
+        ],
+        "final_cell": [
+          3,
+          1
+        ],
+        "before_pose": {
+          "x": 0.46094805416633805,
+          "y": 0.9957332799210921,
+          "yaw": 0.0205592838280871,
+          "yaw_degrees": 1.1779601931609576
+        },
+        "after_pose": {
+          "x": 0.48363087695320156,
+          "y": 0.5237844465159888,
+          "yaw": -1.5565793730824733,
+          "yaw_degrees": -89.1854285547453
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "south",
+        "pose": {
+          "x": 0.48363087695320156,
+          "y": 0.5237844465159888,
+          "yaw": -1.5565793730824733,
+          "yaw_degrees": -89.1854285547453
+        }
+      }
+    },
+    {
+      "step": 8,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "south",
+      "pose_before": {
+        "x": 0.48363087695320156,
+        "y": 0.5237844465159888,
+        "yaw": -1.5565793730824733,
+        "yaw_degrees": -89.1854285547453
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing south.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "west",
+      "legal_action_names": [
+        "backward",
+        "forward",
+        "right"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "west",
+        "from_cell": [
+          3,
+          1
+        ],
+        "intended_cell": [
+          3,
+          0
+        ],
+        "final_cell": [
+          3,
+          0
+        ],
+        "before_pose": {
+          "x": 0.48363087695320156,
+          "y": 0.5237844465159888,
+          "yaw": -1.5565793730824733,
+          "yaw_degrees": -89.1854285547453
+        },
+        "after_pose": {
+          "x": 0.011551916622415294,
+          "y": 0.5040516205934432,
+          "yaw": -3.133627939737587,
+          "yaw_degrees": -179.5436555112392
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "west",
+        "pose": {
+          "x": 0.011551916622415294,
+          "y": 0.5040516205934432,
+          "yaw": -3.133627939737587,
+          "yaw_degrees": -179.5436555112392
+        }
+      }
+    },
+    {
+      "step": 9,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "west",
+      "pose_before": {
+        "x": 0.011551916622415294,
+        "y": 0.5040516205934432,
+        "yaw": -3.133627939737587,
+        "yaw_degrees": -179.5436555112392
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing west.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "north",
+      "legal_action_names": [
+        "backward",
+        "right",
+        "left"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "north",
+        "from_cell": [
+          3,
+          0
+        ],
+        "intended_cell": [
+          2,
+          0
+        ],
+        "final_cell": [
+          2,
+          0
+        ],
+        "before_pose": {
+          "x": 0.011551916622415294,
+          "y": 0.5040516205934432,
+          "yaw": -3.133627939737587,
+          "yaw_degrees": -179.5436555112392
+        },
+        "after_pose": {
+          "x": -0.013266773210299532,
+          "y": 0.9761329338454228,
+          "yaw": 1.5895990424536202,
+          "yaw_degrees": 91.07731625062941
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "north",
+        "pose": {
+          "x": -0.013266773210299532,
+          "y": 0.9761329338454228,
+          "yaw": 1.5895990424536202,
+          "yaw_degrees": 91.07731625062941
+        }
+      }
+    },
+    {
+      "step": 10,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "north",
+      "pose_before": {
+        "x": -0.013266773210299532,
+        "y": 0.9761329338454228,
+        "yaw": 1.5895990424536202,
+        "yaw_degrees": 91.07731625062941
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing north.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "east",
+      "legal_action_names": [
+        "right",
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "east",
+        "from_cell": [
+          2,
+          0
+        ],
+        "intended_cell": [
+          2,
+          1
+        ],
+        "final_cell": [
+          2,
+          1
+        ],
+        "before_pose": {
+          "x": -0.013266773210299532,
+          "y": 0.9761329338454228,
+          "yaw": 1.5895990424536202,
+          "yaw_degrees": 91.07731625062941
+        },
+        "after_pose": {
+          "x": 0.45871629251609436,
+          "y": 0.99810752195766,
+          "yaw": 0.012717293610807817,
+          "yaw_degrees": 0.7286472507279752
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "east",
+        "pose": {
+          "x": 0.45871629251609436,
+          "y": 0.99810752195766,
+          "yaw": 0.012717293610807817,
+          "yaw_degrees": 0.7286472507279752
+        }
+      }
+    },
+    {
+      "step": 11,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 0.45871629251609436,
+        "y": 0.99810752195766,
+        "yaw": 0.012717293610807817,
+        "yaw_degrees": 0.7286472507279752
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "forward",
+        "right"
+      ],
+      "parsed_action": "south",
+      "legal_action_names": [
+        "left",
+        "right",
+        "backward"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 1,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "south",
+        "from_cell": [
+          2,
+          1
+        ],
+        "intended_cell": [
+          3,
+          1
+        ],
+        "final_cell": [
+          3,
+          1
+        ],
+        "before_pose": {
+          "x": 0.45871629251609436,
+          "y": 0.99810752195766,
+          "yaw": 0.012717293610807817,
+          "yaw_degrees": 0.7286472507279752
+        },
+        "after_pose": {
+          "x": 0.47783256157454546,
+          "y": 0.5259953178613331,
+          "yaw": -1.564132778855822,
+          "yaw_degrees": -89.61820682650793
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "south",
+        "pose": {
+          "x": 0.47783256157454546,
+          "y": 0.5259953178613331,
+          "yaw": -1.564132778855822,
+          "yaw_degrees": -89.61820682650793
+        }
+      }
+    },
+    {
+      "step": 12,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "south",
+      "pose_before": {
+        "x": 0.47783256157454546,
+        "y": 0.5259953178613331,
+        "yaw": -1.564132778855822,
+        "yaw_degrees": -89.61820682650793
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing south.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "west",
+      "legal_action_names": [
+        "backward",
+        "forward",
+        "right"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "west",
+        "from_cell": [
+          3,
+          1
+        ],
+        "intended_cell": [
+          3,
+          0
+        ],
+        "final_cell": [
+          3,
+          0
+        ],
+        "before_pose": {
+          "x": 0.47783256157454546,
+          "y": 0.5259953178613331,
+          "yaw": -1.564132778855822,
+          "yaw_degrees": -89.61820682650793
+        },
+        "after_pose": {
+          "x": 0.00572187257815189,
+          "y": 0.5017473831194972,
+          "yaw": -3.1240008847586807,
+          "yaw_degrees": -178.99206589180747
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "west",
+        "pose": {
+          "x": 0.00572187257815189,
+          "y": 0.5017473831194972,
+          "yaw": -3.1240008847586807,
+          "yaw_degrees": -178.99206589180747
+        }
+      }
+    },
+    {
+      "step": 13,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "west",
+      "pose_before": {
+        "x": 0.00572187257815189,
+        "y": 0.5017473831194972,
+        "yaw": -3.1240008847586807,
+        "yaw_degrees": -178.99206589180747
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing west.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "north",
+      "legal_action_names": [
+        "backward",
+        "right",
+        "left"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "north",
+        "from_cell": [
+          3,
+          0
+        ],
+        "intended_cell": [
+          2,
+          0
+        ],
+        "final_cell": [
+          2,
+          0
+        ],
+        "before_pose": {
+          "x": 0.00572187257815189,
+          "y": 0.5017473831194972,
+          "yaw": -3.1240008847586807,
+          "yaw_degrees": -178.99206589180747
+        },
+        "after_pose": {
+          "x": -0.015704140341261292,
+          "y": 0.9737615040932927,
+          "yaw": 1.5823518431660741,
+          "yaw_degrees": 90.6620823181628
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "north",
+        "pose": {
+          "x": -0.015704140341261292,
+          "y": 0.9737615040932927,
+          "yaw": 1.5823518431660741,
+          "yaw_degrees": 90.6620823181628
+        }
+      }
+    },
+    {
+      "step": 14,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "north",
+      "pose_before": {
+        "x": -0.015704140341261292,
+        "y": 0.9737615040932927,
+        "yaw": 1.5823518431660741,
+        "yaw_degrees": 90.6620823181628
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing north.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "east",
+      "legal_action_names": [
+        "right",
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "east",
+        "from_cell": [
+          2,
+          0
+        ],
+        "intended_cell": [
+          2,
+          1
+        ],
+        "final_cell": [
+          2,
+          1
+        ],
+        "before_pose": {
+          "x": -0.015704140341261292,
+          "y": 0.9737615040932927,
+          "yaw": 1.5823518431660741,
+          "yaw_degrees": 90.6620823181628
+        },
+        "after_pose": {
+          "x": 0.4564260110296762,
+          "y": 0.9923526038147702,
+          "yaw": 0.005545672906307316,
+          "yaw_degrees": 0.31774365209145844
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "east",
+        "pose": {
+          "x": 0.4564260110296762,
+          "y": 0.9923526038147702,
+          "yaw": 0.005545672906307316,
+          "yaw_degrees": 0.31774365209145844
+        }
+      }
+    },
+    {
+      "step": 15,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 0.4564260110296762,
+        "y": 0.9923526038147702,
+        "yaw": 0.005545672906307316,
+        "yaw_degrees": 0.31774365209145844
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "forward",
+        "right"
+      ],
+      "parsed_action": "south",
+      "legal_action_names": [
+        "left",
+        "right",
+        "backward"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 1,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "south",
+        "from_cell": [
+          2,
+          1
+        ],
+        "intended_cell": [
+          3,
+          1
+        ],
+        "final_cell": [
+          3,
+          1
+        ],
+        "before_pose": {
+          "x": 0.4564260110296762,
+          "y": 0.9923526038147702,
+          "yaw": 0.005545672906307316,
+          "yaw_degrees": 0.31774365209145844
+        },
+        "after_pose": {
+          "x": 0.480177971529836,
+          "y": 0.5202113594522657,
+          "yaw": -1.5542511760795295,
+          "yaw_degrees": -89.05203269260161
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "south",
+        "pose": {
+          "x": 0.480177971529836,
+          "y": 0.5202113594522657,
+          "yaw": -1.5542511760795295,
+          "yaw_degrees": -89.05203269260161
+        }
+      }
+    },
+    {
+      "step": 16,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "south",
+      "pose_before": {
+        "x": 0.480177971529836,
+        "y": 0.5202113594522657,
+        "yaw": -1.5542511760795295,
+        "yaw_degrees": -89.05203269260161
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing south.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "west",
+      "legal_action_names": [
+        "backward",
+        "forward",
+        "right"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "west",
+        "from_cell": [
+          3,
+          1
+        ],
+        "intended_cell": [
+          3,
+          0
+        ],
+        "final_cell": [
+          3,
+          0
+        ],
+        "before_pose": {
+          "x": 0.480177971529836,
+          "y": 0.5202113594522657,
+          "yaw": -1.5542511760795295,
+          "yaw_degrees": -89.05203269260161
+        },
+        "after_pose": {
+          "x": 0.008147610086359903,
+          "y": 0.4992273462651772,
+          "yaw": -3.13098146983517,
+          "yaw_degrees": -179.39202395522233
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "west",
+        "pose": {
+          "x": 0.008147610086359903,
+          "y": 0.4992273462651772,
+          "yaw": -3.13098146983517,
+          "yaw_degrees": -179.39202395522233
+        }
+      }
+    },
+    {
+      "step": 17,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        3,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "west",
+      "pose_before": {
+        "x": 0.008147610086359903,
+        "y": 0.4992273462651772,
+        "yaw": -3.13098146983517,
+        "yaw_degrees": -179.39202395522233
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (3, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing west.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "north",
+      "legal_action_names": [
+        "backward",
+        "right",
+        "left"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "north",
+        "from_cell": [
+          3,
+          0
+        ],
+        "intended_cell": [
+          2,
+          0
+        ],
+        "final_cell": [
+          2,
+          0
+        ],
+        "before_pose": {
+          "x": 0.008147610086359903,
+          "y": 0.4992273462651772,
+          "yaw": -3.13098146983517,
+          "yaw_degrees": -179.39202395522233
+        },
+        "after_pose": {
+          "x": -0.018036182954052328,
+          "y": 0.971239198124965,
+          "yaw": 1.5924939700688538,
+          "yaw_degrees": 91.24318338497817
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          0
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "north",
+        "pose": {
+          "x": -0.018036182954052328,
+          "y": 0.971239198124965,
+          "yaw": 1.5924939700688538,
+          "yaw_degrees": 91.24318338497817
+        }
+      }
+    },
+    {
+      "step": 18,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        0
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "north",
+      "pose_before": {
+        "x": -0.018036182954052328,
+        "y": 0.971239198124965,
+        "yaw": 1.5924939700688538,
+        "yaw_degrees": 91.24318338497817
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 0)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing north.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "right"
+      ],
+      "parsed_action": "east",
+      "legal_action_names": [
+        "right",
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "east",
+        "from_cell": [
+          2,
+          0
+        ],
+        "intended_cell": [
+          2,
+          1
+        ],
+        "final_cell": [
+          2,
+          1
+        ],
+        "before_pose": {
+          "x": -0.018036182954052328,
+          "y": 0.971239198124965,
+          "yaw": 1.5924939700688538,
+          "yaw_degrees": 91.24318338497817
+        },
+        "after_pose": {
+          "x": 0.4538787290902302,
+          "y": 0.9947005011365442,
+          "yaw": 0.01586218760540621,
+          "yaw_degrees": 0.9088364036345016
+        }
+      },
+      "state_after": {
+        "agent": [
+          2,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "east",
+        "pose": {
+          "x": 0.4538787290902302,
+          "y": 0.9947005011365442,
+          "yaw": 0.01586218760540621,
+          "yaw_degrees": 0.9088364036345016
+        }
+      }
+    },
+    {
+      "step": 19,
+      "policy_type": "legality_shield",
+      "mode": "egocentric",
+      "agent_pos": [
+        2,
+        1
+      ],
+      "goal_pos": [
+        0,
+        4
+      ],
+      "facing": "east",
+      "pose_before": {
+        "x": 0.4538787290902302,
+        "y": 0.9947005011365442,
+        "yaw": 0.01586218760540621,
+        "yaw_degrees": 0.9088364036345016
+      },
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 5 x 5\nAgent position: (2, 1)\nGoal position: (0, 4)\nObstacle cells: [(2, 2), (3, 2)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "right",
+      "all_raw_answers": [
+        "forward",
+        "right"
+      ],
+      "parsed_action": "south",
+      "legal_action_names": [
+        "left",
+        "right",
+        "backward"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 1,
+      "parse_failure": false,
+      "executed": true,
+      "blocked": false,
+      "blocked_type": null,
+      "execution_result": {
+        "executed": true,
+        "blocked": false,
+        "blocked_type": null,
+        "action": "south",
+        "from_cell": [
+          2,
+          1
+        ],
+        "intended_cell": [
+          3,
+          1
+        ],
+        "final_cell": [
+          3,
+          1
+        ],
+        "before_pose": {
+          "x": 0.4538787290902302,
+          "y": 0.9947005011365442,
+          "yaw": 0.01586218760540621,
+          "yaw_degrees": 0.9088364036345016
+        },
+        "after_pose": {
+          "x": 0.47456957083279017,
+          "y": 0.5226532515831762,
+          "yaw": -1.560794875697677,
+          "yaw_degrees": -89.42695906312284
+        }
+      },
+      "state_after": {
+        "agent": [
+          3,
+          1
+        ],
+        "goal": [
+          0,
+          4
+        ],
+        "facing": "south",
+        "pose": {
+          "x": 0.47456957083279017,
+          "y": 0.5226532515831762,
+          "yaw": -1.560794875697677,
+          "yaw_degrees": -89.42695906312284
+        }
+      }
+    }
+  ],
+  "model": "openai/gpt-4o-mini",
+  "provider": "OpenAI",
+  "temperature": 0.0,
+  "max_reprompts": 2,
+  "intervention_exhaustion_behavior": "parse_failure; no illegal action is executed"
+}
