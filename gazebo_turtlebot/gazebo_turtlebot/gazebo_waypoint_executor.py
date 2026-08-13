@@ -1,7 +1,7 @@
 import math
 import time
 
-from gazebo_turtlebot.grid_action_controller import (
+from .grid_action_controller import (
     CARDINAL_HEADINGS,
     DISTANCE_TOLERANCE,
 )

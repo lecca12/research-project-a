@@ -9,28 +9,30 @@ from llm_policy import make_openai_policy_fn
 from minigrid_wrapper import (
     MiniGridCardinalWrapper,
     ACTION_NAMES,
+    ACTION_TO_DELTA,
 )
 
-# Import the already-validated experiment logic.
-# Nothing in run_farama_minigrid_experiment.py is modified.
+# Reuse the already-validated Farama experiment logic.
+# The existing Farama runner itself is not modified.
 from run_farama_minigrid_experiment import (
     choose_action,
     get_prompt,
     get_legal_cardinal_actions,
 )
 
-from gazebo_turtlebot.gazebo_turtlebot.gazebo_adapter import (
+from gazebo_turtlebot.gazebo_adapter import (
     GazeboAdapter,
 )
 
-from gazebo_turtlebot.gazebo_turtlebot.grid_action_controller import (
+from gazebo_turtlebot.grid_action_controller import (
     CARDINAL_HEADINGS,
     CELL_SIZE_METRES,
 )
 
-from gazebo_turtlebot.gazebo_turtlebot.gazebo_waypoint_executor import (
+from gazebo_turtlebot.gazebo_waypoint_executor import (
     GazeboWaypointExecutor,
 )
+
 
 MAX_STEPS_BY_ENV = {
     "MiniGrid-SimpleCrossingS9N1-v0": 9 ** 2,
@@ -85,7 +87,9 @@ def save_result(
     )
 
     temporary_path = (
-        output_path.with_suffix(".tmp")
+        output_path.with_suffix(
+            ".tmp"
+        )
     )
 
     with temporary_path.open(
@@ -108,11 +112,10 @@ def align_robot_to_facing(
     facing_name,
 ):
     """
-    Match the physical TurtleBot heading to the initial MiniGrid facing.
+    Match the TurtleBot's physical heading to the initial MiniGrid facing.
 
-    After the first executed action, the existing cardinal controller
-    automatically leaves the robot facing the executed cardinal direction,
-    which matches MiniGridCardinalWrapper.step_cardinal().
+    After each executed cardinal action, the robot is left facing the same
+    cardinal direction as MiniGridCardinalWrapper.step_cardinal().
     """
     target_yaw = (
         CARDINAL_HEADINGS[
@@ -141,7 +144,7 @@ def expected_world_position(
     target_cell,
 ):
     """
-    Map a MiniGrid cell to its expected Gazebo coordinate.
+    Convert a MiniGrid cell into its absolute Gazebo waypoint.
 
     MiniGrid:
         row increases south
@@ -194,9 +197,9 @@ def run_episode(
     max_steps,
     verbose=True,
 ):
-    # ------------------------------------------------------------------
-    # LOGICAL BENCHMARK ENVIRONMENT
-    # ------------------------------------------------------------------
+    # ================================================================
+    # EXACT FARAMA LOGICAL ENVIRONMENT
+    # ================================================================
 
     env = MiniGridCardinalWrapper(
         env_name=env_name,
@@ -211,11 +214,17 @@ def run_episode(
         env.get_state()
     )
 
-    # ------------------------------------------------------------------
-    # PHYSICAL EXECUTION BACKEND
-    # ------------------------------------------------------------------
+    # ================================================================
+    # GAZEBO PHYSICAL EXECUTION BACKEND
+    # ================================================================
 
     adapter = GazeboAdapter()
+
+    waypoint_executor = (
+        GazeboWaypointExecutor(
+            adapter
+        )
+    )
 
     step_logs = []
 
@@ -223,8 +232,10 @@ def run_episode(
     retry_budget_exhausted = False
 
     try:
-        # Make the physical robot's initial heading agree with the exact
-        # MiniGrid state used in the prompt.
+        # ------------------------------------------------------------
+        # Align physical orientation with the exact MiniGrid state.
+        # ------------------------------------------------------------
+
         align_robot_to_facing(
             adapter,
             initial_grid_state[
@@ -236,6 +247,8 @@ def run_episode(
             adapter.get_state()
         )
 
+        # The current Gazebo pose becomes the physical location of the
+        # MiniGrid starting cell.
         anchor_x = (
             initial_robot_state["x"]
         )
@@ -314,6 +327,10 @@ def run_episode(
 
         print("=" * 80)
 
+        # ============================================================
+        # EPISODE LOOP
+        # ============================================================
+
         for step in range(
             max_steps
         ):
@@ -328,8 +345,10 @@ def run_episode(
                 reached_goal = True
                 break
 
-            # This is the exact prompt-building function used by the
-            # Farama benchmark.
+            # --------------------------------------------------------
+            # Exact prompt from the existing Farama wrapper.
+            # --------------------------------------------------------
+
             prompt = get_prompt(
                 env,
                 mode,
@@ -388,9 +407,9 @@ def run_episode(
                     ],
                 )
 
-            # ----------------------------------------------------------
+            # ========================================================
             # EXACT VALIDATED SHIELD / CONTROL LOGIC
-            # ----------------------------------------------------------
+            # ========================================================
 
             (
                 parsed_action,
@@ -430,6 +449,11 @@ def run_episode(
                         "shield_reprompts"
                     ],
                 )
+
+            # --------------------------------------------------------
+            # Retry-budget exhaustion.
+            # No illegal action is physically executed.
+            # --------------------------------------------------------
 
             if parsed_action is None:
                 retry_budget_exhausted = True
@@ -485,9 +509,10 @@ def run_episode(
 
                 break
 
-            # The intervention arms are only allowed to return legal
-            # actions. Keep this assertion as a safety check before
-            # commanding the physical robot.
+            # --------------------------------------------------------
+            # Safety assertion.
+            # --------------------------------------------------------
+
             if (
                 parsed_action
                 not in legal_actions
@@ -509,23 +534,61 @@ def run_episode(
                 action_name,
             )
 
-            # ----------------------------------------------------------
-            # PHYSICAL EXECUTION
-            # ----------------------------------------------------------
+            # ========================================================
+            # DETERMINE THE NEXT LOGICAL CELL BEFORE PHYSICAL MOTION
+            # ========================================================
+
+            current_row, current_col = (
+                state_before["agent"]
+            )
+
+            delta_row, delta_col = (
+                ACTION_TO_DELTA[
+                    parsed_action
+                ]
+            )
+
+            target_cell = (
+                current_row
+                + delta_row,
+                current_col
+                + delta_col,
+            )
+
+            # Convert the target MiniGrid cell into an absolute Gazebo
+            # waypoint anchored to the episode's physical start pose.
+            expected_x, expected_y = (
+                expected_world_position(
+                    anchor_x=anchor_x,
+                    anchor_y=anchor_y,
+                    anchor_cell=(
+                        anchor_cell
+                    ),
+                    target_cell=(
+                        target_cell
+                    ),
+                )
+            )
+
+            # ========================================================
+            # PHYSICAL EXECUTION TO ABSOLUTE CELL CENTRE
+            # ========================================================
 
             robot_before = (
                 adapter.get_state()
             )
 
             robot_after = (
-                adapter.execute(
-                    action_name
+                waypoint_executor.execute_to_waypoint(
+                    action=action_name,
+                    target_x=expected_x,
+                    target_y=expected_y,
                 )
             )
 
-            # ----------------------------------------------------------
+            # ========================================================
             # UPDATE THE EXACT FARAMA LOGICAL STATE
-            # ----------------------------------------------------------
+            # ========================================================
 
             (
                 next_state,
@@ -537,20 +600,26 @@ def run_episode(
                 parsed_action
             )
 
-            expected_x, expected_y = (
-                expected_world_position(
-                    anchor_x=anchor_x,
-                    anchor_y=anchor_y,
-                    anchor_cell=(
-                        anchor_cell
-                    ),
-                    target_cell=(
-                        next_state[
-                            "agent"
-                        ]
-                    ),
+            # The logical simulator should have moved into exactly the
+            # cell whose waypoint we just physically executed.
+            if (
+                tuple(
+                    next_state["agent"]
                 )
-            )
+                != tuple(
+                    target_cell
+                )
+            ):
+                raise RuntimeError(
+                    "Logical state mismatch: "
+                    f"expected {target_cell}, "
+                    f"got "
+                    f"{next_state['agent']}."
+                )
+
+            # ========================================================
+            # PHYSICAL / LOGICAL ALIGNMENT CHECK
+            # ========================================================
 
             position_error = (
                 physical_position_error(
@@ -606,6 +675,10 @@ def run_episode(
                     f"{position_error:.3f} m",
                 )
 
+            # ========================================================
+            # LOG STEP
+            # ========================================================
+
             step_logs.append(
                 {
                     "step": step,
@@ -615,7 +688,9 @@ def run_episode(
                     "grid_text": (
                         grid_text
                     ),
-                    "prompt": prompt,
+                    "prompt": (
+                        prompt
+                    ),
                     "raw_model_answer": (
                         action_metadata[
                             "raw_model_answer"
@@ -655,9 +730,16 @@ def run_episode(
                     "robot_after": (
                         robot_after
                     ),
+                    "target_grid_cell": (
+                        target_cell
+                    ),
                     "expected_waypoint": {
-                        "x": expected_x,
-                        "y": expected_y,
+                        "x": (
+                            expected_x
+                        ),
+                        "y": (
+                            expected_y
+                        ),
                     },
                     "physical_position_error_m": (
                         position_error
@@ -665,14 +747,18 @@ def run_episode(
                     "grid_state_after": (
                         next_state
                     ),
-                    "reward": reward,
+                    "reward": (
+                        reward
+                    ),
                     "terminated": (
                         terminated
                     ),
                     "truncated": (
                         truncated
                     ),
-                    "info": info,
+                    "info": (
+                        info
+                    ),
                 }
             )
 
@@ -687,6 +773,10 @@ def run_episode(
                 print("=" * 80)
 
                 break
+
+        # ============================================================
+        # FINAL STATE
+        # ============================================================
 
         final_grid_state = (
             env.get_state()
@@ -703,15 +793,21 @@ def run_episode(
             "env_name": (
                 env_name
             ),
-            "seed": int(seed),
+            "seed": (
+                int(seed)
+            ),
             "policy_type": (
                 policy_type
             ),
-            "mode": mode,
+            "mode": (
+                mode
+            ),
             "max_steps": (
                 max_steps
             ),
-            "max_reprompts": 2,
+            "max_reprompts": (
+                2
+            ),
             "reached_goal": (
                 reached_goal
             ),
@@ -736,6 +832,9 @@ def run_episode(
             "cell_size_metres": (
                 CELL_SIZE_METRES
             ),
+            "execution_mode": (
+                "absolute_grid_waypoints"
+            ),
             "step_logs": (
                 step_logs
             ),
@@ -750,8 +849,8 @@ def build_argument_parser():
     parser = argparse.ArgumentParser(
         description=(
             "Replay an exact Farama MiniGrid "
-            "benchmark state using a physical "
-            "TurtleBot3 execution backend in Gazebo."
+            "benchmark state using a TurtleBot3 "
+            "execution backend in Gazebo."
         )
     )
 
@@ -788,7 +887,9 @@ def build_argument_parser():
             "allocentric",
             "egocentric",
         ],
-        default="allocentric",
+        default=(
+            "allocentric"
+        ),
     )
 
     parser.add_argument(
@@ -800,7 +901,9 @@ def build_argument_parser():
 
     parser.add_argument(
         "--provider",
-        default="OpenAI",
+        default=(
+            "OpenAI"
+        ),
     )
 
     parser.add_argument(
@@ -845,7 +948,9 @@ def main():
         make_openai_policy_fn(
             model=args.model,
             temperature=0.0,
-            provider=args.provider,
+            provider=(
+                args.provider
+            ),
             max_output_tokens=16,
         )
     )
@@ -854,13 +959,21 @@ def main():
         env_name=(
             args.environment
         ),
-        seed=args.seed,
+        seed=(
+            args.seed
+        ),
         policy_type=(
             args.policy
         ),
-        mode=args.mode,
-        policy_fn=policy_fn,
-        max_steps=max_steps,
+        mode=(
+            args.mode
+        ),
+        policy_fn=(
+            policy_fn
+        ),
+        max_steps=(
+            max_steps
+        ),
     )
 
     result["model"] = (
@@ -896,12 +1009,16 @@ def main():
 
     print(
         "Environment:",
-        result["env_name"],
+        result[
+            "env_name"
+        ],
     )
 
     print(
         "Seed:",
-        result["seed"],
+        result[
+            "seed"
+        ],
     )
 
     print(
