@@ -1,0 +1,1289 @@
+{
+  "run_type": "gazebo_farama_replay",
+  "env_name": "MiniGrid-SimpleCrossingS9N1-v0",
+  "seed": 0,
+  "policy_type": "reprompt_control",
+  "mode": "egocentric",
+  "max_steps": 20,
+  "max_reprompts": 2,
+  "reached_goal": false,
+  "retry_budget_exhausted": true,
+  "num_steps": 7,
+  "initial_grid_state": {
+    "grid_size": [
+      9,
+      9
+    ],
+    "agent": [
+      1,
+      1
+    ],
+    "goal": [
+      7,
+      7
+    ],
+    "facing": 0,
+    "facing_name": "east",
+    "obstacle_cells": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        7
+      ]
+    ]
+  },
+  "final_grid_state": {
+    "grid_size": [
+      9,
+      9
+    ],
+    "agent": [
+      1,
+      7
+    ],
+    "goal": [
+      7,
+      7
+    ],
+    "facing": 0,
+    "facing_name": "east",
+    "obstacle_cells": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        7
+      ]
+    ]
+  },
+  "initial_robot_state": {
+    "x": 8.962346369099764,
+    "y": 0.009015448124301122,
+    "yaw": 0.0002862251195011348,
+    "yaw_degrees": 0.01639949133804266
+  },
+  "final_robot_state": {
+    "x": 11.947212587332261,
+    "y": 0.009859037253930945,
+    "yaw": 0.000286189412910218,
+    "yaw_degrees": 0.01639744550108233
+  },
+  "cell_size_metres": 0.5,
+  "execution_mode": "absolute_grid_waypoints",
+  "physical_walls_enabled": true,
+  "physical_wall_model": {
+    "model_name": "farama_physical_walls",
+    "outer_wall_cells": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        0,
+        6
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        0,
+        8
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        8
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        3,
+        8
+      ],
+      [
+        4,
+        0
+      ],
+      [
+        4,
+        8
+      ],
+      [
+        5,
+        0
+      ],
+      [
+        5,
+        8
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        6,
+        8
+      ],
+      [
+        7,
+        0
+      ],
+      [
+        7,
+        8
+      ],
+      [
+        8,
+        0
+      ],
+      [
+        8,
+        1
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        3
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        5
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        7
+      ],
+      [
+        8,
+        8
+      ]
+    ],
+    "interior_wall_cells": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        7
+      ]
+    ],
+    "all_wall_cells": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        0,
+        6
+      ],
+      [
+        0,
+        7
+      ],
+      [
+        0,
+        8
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        8
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        5
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        7
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        3,
+        8
+      ],
+      [
+        4,
+        0
+      ],
+      [
+        4,
+        8
+      ],
+      [
+        5,
+        0
+      ],
+      [
+        5,
+        8
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        6,
+        8
+      ],
+      [
+        7,
+        0
+      ],
+      [
+        7,
+        8
+      ],
+      [
+        8,
+        0
+      ],
+      [
+        8,
+        1
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        3
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        5
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        7
+      ],
+      [
+        8,
+        8
+      ]
+    ],
+    "num_outer_wall_cells": 32,
+    "num_interior_wall_cells": 6,
+    "num_total_wall_cells": 38
+  },
+  "physical_walls_cleaned_after_run": true,
+  "step_logs": [
+    {
+      "step": 0,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          1
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX > . . . . . . X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 1)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": 1,
+      "parsed_action_name": "east",
+      "legal_action_names": [
+        "forward",
+        "right"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "robot_before": {
+        "x": 8.962348326305909,
+        "y": 0.009015259289157088,
+        "yaw": 0.0002864689909585797,
+        "yaw_degrees": 0.016413464143297956
+      },
+      "robot_after": {
+        "x": 9.438004635363338,
+        "y": 0.009150482806828439,
+        "yaw": 0.00028900252915189695,
+        "yaw_degrees": 0.016558625189010235
+      },
+      "target_grid_cell": [
+        1,
+        2
+      ],
+      "expected_waypoint": {
+        "x": 9.462346369099764,
+        "y": 0.009015448124301122
+      },
+      "physical_position_error_m": 0.024342108282984557,
+      "grid_state_after": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          2
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "reward": -1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "hit_wall": false,
+        "hit_obstacle": false,
+        "blocked_type": null,
+        "action_name": "east"
+      }
+    },
+    {
+      "step": 1,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          2
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX . > . . . . . X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 2)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": 1,
+      "parsed_action_name": "east",
+      "legal_action_names": [
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "robot_before": {
+        "x": 9.438004635363338,
+        "y": 0.009150482806828439,
+        "yaw": 0.00028900252915189695,
+        "yaw_degrees": 0.016558625189010235
+      },
+      "robot_after": {
+        "x": 9.948007807187052,
+        "y": 0.009294939745461382,
+        "yaw": 0.00028830805772010195,
+        "yaw_degrees": 0.016518834906975973
+      },
+      "target_grid_cell": [
+        1,
+        3
+      ],
+      "expected_waypoint": {
+        "x": 9.962346369099764,
+        "y": 0.009015448124301122
+      },
+      "physical_position_error_m": 0.014341285621972084,
+      "grid_state_after": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          3
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "reward": -1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "hit_wall": false,
+        "hit_obstacle": false,
+        "blocked_type": null,
+        "action_name": "east"
+      }
+    },
+    {
+      "step": 2,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          3
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX . . > . . . . X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 3)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": 1,
+      "parsed_action_name": "east",
+      "legal_action_names": [
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "robot_before": {
+        "x": 9.948007807187052,
+        "y": 0.009294939745461382,
+        "yaw": 0.00028830805772010195,
+        "yaw_degrees": 0.016518834906975973
+      },
+      "robot_after": {
+        "x": 10.447808960193687,
+        "y": 0.009436549136930874,
+        "yaw": 0.00028801526868774195,
+        "yaw_degrees": 0.016502059331134026
+      },
+      "target_grid_cell": [
+        1,
+        4
+      ],
+      "expected_waypoint": {
+        "x": 10.462346369099764,
+        "y": 0.009015448124301122
+      },
+      "physical_position_error_m": 0.014543506584223237,
+      "grid_state_after": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          4
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "reward": -1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "hit_wall": false,
+        "hit_obstacle": false,
+        "blocked_type": null,
+        "action_name": "east"
+      }
+    },
+    {
+      "step": 3,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          4
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX . . . > . . . X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 4)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": 1,
+      "parsed_action_name": "east",
+      "legal_action_names": [
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "robot_before": {
+        "x": 10.447808960193687,
+        "y": 0.009436549136930874,
+        "yaw": 0.00028801526868774195,
+        "yaw_degrees": 0.016502059331134026
+      },
+      "robot_after": {
+        "x": 10.947609680529165,
+        "y": 0.009577574466116708,
+        "yaw": 0.00028732826801070656,
+        "yaw_degrees": 0.016462697091817267
+      },
+      "target_grid_cell": [
+        1,
+        5
+      ],
+      "expected_waypoint": {
+        "x": 10.962346369099764,
+        "y": 0.009015448124301122
+      },
+      "physical_position_error_m": 0.014747405739687965,
+      "grid_state_after": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          5
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "reward": -1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "hit_wall": false,
+        "hit_obstacle": false,
+        "blocked_type": null,
+        "action_name": "east"
+      }
+    },
+    {
+      "step": 4,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          5
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX . . . . > . . X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 5)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": 1,
+      "parsed_action_name": "east",
+      "legal_action_names": [
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "robot_before": {
+        "x": 10.947609680529165,
+        "y": 0.009577574466116708,
+        "yaw": 0.00028732826801070656,
+        "yaw_degrees": 0.016462697091817267
+      },
+      "robot_after": {
+        "x": 11.447410287499894,
+        "y": 0.009718491108956784,
+        "yaw": 0.00028686434990988927,
+        "yaw_degrees": 0.01643611654260071
+      },
+      "target_grid_cell": [
+        1,
+        6
+      ],
+      "expected_waypoint": {
+        "x": 11.462346369099764,
+        "y": 0.009015448124301122
+      },
+      "physical_position_error_m": 0.014952618599973148,
+      "grid_state_after": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          6
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "reward": -1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "hit_wall": false,
+        "hit_obstacle": false,
+        "blocked_type": null,
+        "action_name": "east"
+      }
+    },
+    {
+      "step": 5,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          6
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX . . . . . > . X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 6)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "forward",
+      "all_raw_answers": [
+        "forward"
+      ],
+      "parsed_action": 1,
+      "parsed_action_name": "east",
+      "legal_action_names": [
+        "forward",
+        "backward"
+      ],
+      "shield_used": false,
+      "shield_reprompts": 0,
+      "parse_failure": false,
+      "executed": true,
+      "robot_before": {
+        "x": 11.447410287499894,
+        "y": 0.009718491108956784,
+        "yaw": 0.00028686434990988927,
+        "yaw_degrees": 0.01643611654260071
+      },
+      "robot_after": {
+        "x": 11.947212587332261,
+        "y": 0.009859037253930945,
+        "yaw": 0.000286189412910218,
+        "yaw_degrees": 0.01639744550108233
+      },
+      "target_grid_cell": [
+        1,
+        7
+      ],
+      "expected_waypoint": {
+        "x": 11.962346369099764,
+        "y": 0.009015448124301122
+      },
+      "physical_position_error_m": 0.015157275256655785,
+      "grid_state_after": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          7
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "reward": -1,
+      "terminated": false,
+      "truncated": false,
+      "info": {
+        "hit_wall": false,
+        "hit_obstacle": false,
+        "blocked_type": null,
+        "action_name": "east"
+      }
+    },
+    {
+      "step": 6,
+      "grid_state_before": {
+        "grid_size": [
+          9,
+          9
+        ],
+        "agent": [
+          1,
+          7
+        ],
+        "goal": [
+          7,
+          7
+        ],
+        "facing": 0,
+        "facing_name": "east",
+        "obstacle_cells": [
+          [
+            2,
+            2
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            5
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            7
+          ]
+        ]
+      },
+      "grid_text": "X X X X X X X X X\nX . . . . . . > X\nX . # # # # # # X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . . X\nX . . . . . . G X\nX X X X X X X X X",
+      "prompt": "You are navigating a MiniGrid environment.\n\nGrid size: 9 x 9\nAgent position: (1, 7)\nGoal position: (7, 7)\nObstacle cells: [(2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (2, 7)]\n\nCoordinate system:\n- Row 0 is the top (north), and row numbers increase downward (south).\n- Column 0 is the left (west), and column numbers increase to the right (east).\n\nThe agent is currently facing east.\n\nRelative actions:\n- forward: move in the direction you are facing\n- right: turn right relative to your current facing and move\n- backward: turn around and move\n- left: turn left relative to your current facing and move\n\nChoose exactly one action from:\nforward, right, backward, left\n\nRules:\n- Do not move into an obstacle cell.\n- Do not move outside the grid or into the outer boundary.\n- Choose the best next move on a shortest valid path to the goal.\n\nAnswer with one word only:\nforward, right, backward, or left\n",
+      "raw_model_answer": "left",
+      "all_raw_answers": [
+        "forward",
+        "right",
+        "left"
+      ],
+      "legal_action_names": [
+        "backward"
+      ],
+      "shield_used": true,
+      "shield_reprompts": 2,
+      "parse_failure": true,
+      "executed": false
+    }
+  ],
+  "status": "complete"
+}
