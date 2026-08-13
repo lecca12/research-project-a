@@ -1,0 +1,104 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: reprompt_control
+Mode: egocentric
+Reached goal: False
+Steps: 4
+Optimal: 12
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: east
+Optimal actions: ['east']
+Legal actions: ['forward', 'right']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0295
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: east
+Optimal actions: ['east']
+Legal actions: ['forward', 'right', 'backward']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . G X
+X X X X X X X X X
+
+Raw answer: forward
+All raw answers: ['forward']
+Parsed action: east
+Optimal actions: ['east']
+Legal actions: ['forward', 'right', 'backward']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . . X
+X . . . # . . G X
+X X X X X X X X X
+
+Raw answer: right
+All raw answers: ['right', 'left', 'right']
+Parsed action: None
+Optimal actions: ['east']
+Legal actions: ['forward', 'backward']
+Correct: False
+Error type: parse_failure
+Shield reprompts: 2
+Step error (m): None
+
+================================================================================
+

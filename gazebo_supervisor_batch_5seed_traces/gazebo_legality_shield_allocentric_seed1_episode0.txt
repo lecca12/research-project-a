@@ -1,0 +1,296 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: legality_shield
+Mode: allocentric
+Reached goal: True
+Steps: 12
+Optimal: 12
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0295
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . > . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . > . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . > X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0345
+
+================================================================================
+
+STEP 7
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X . . . . . . v X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 8
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . v X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 9
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # v X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 10
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . v X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 11
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X # # # # # # . X
+X . . . . . . . X
+X . . . . . . v X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+

@@ -1,0 +1,16 @@
+{
+  "run_type": "gazebo_transfer_pilot",
+  "env_name": "MiniGrid-SimpleCrossingS9N1-v0",
+  "seed": 0,
+  "mode": "allocentric",
+  "arm": "legality_shield",
+  "model": "openai/gpt-4o-mini",
+  "provider_pin": "OpenAI",
+  "short_temperature": 0.0,
+  "short_max_output_tokens": 16,
+  "max_reprompts": 2,
+  "early_stop_repeats": 3,
+  "cell_size_metres": 0.5,
+  "episodes": 1,
+  "optimal_path_length": 12
+}

@@ -1,0 +1,176 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: legality_shield
+Mode: allocentric
+Reached goal: False
+Steps: 7
+Optimal: 12
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . . . X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['south']
+Legal actions: ['east', 'south']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0294
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . . . X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['west']
+Legal actions: ['east', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . . . X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['west']
+Legal actions: ['east', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . . . X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['west']
+Legal actions: ['east', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . > . . X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['south', 'east']
+Parsed action: east
+Optimal actions: ['west']
+Legal actions: ['east', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . > . X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['west']
+Legal actions: ['east', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . . > X
+X . # # # # # # X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . . X
+X . . . . . . G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south', 'east', 'south']
+Parsed action: None
+Optimal actions: ['west']
+Legal actions: ['west']
+Correct: False
+Error type: parse_failure
+Shield reprompts: 2
+Step error (m): None
+
+================================================================================
+

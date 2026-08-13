@@ -1,0 +1,1952 @@
+Environment: MiniGrid-SimpleCrossingS9N1-v0
+Policy: legality_shield
+Mode: allocentric
+Reached goal: False
+Steps: 81
+Optimal: 12
+================================================================================
+
+STEP 0
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X > . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0294
+
+================================================================================
+
+STEP 1
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . > . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 2
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . > . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 3
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . > . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['east', 'south']
+Legal actions: ['east', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0155
+
+================================================================================
+
+STEP 4
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . > # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['east', 'south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0346
+
+================================================================================
+
+STEP 5
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . v # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 6
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . v # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['east', 'south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 7
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . v # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 8
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . v # . X
+X . . . . . . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['east', 'south']
+Parsed action: south
+Optimal actions: ['south']
+Legal actions: ['north', 'south', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 9
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . v . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0162
+
+================================================================================
+
+STEP 10
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0377
+
+================================================================================
+
+STEP 11
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 12
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0356
+
+================================================================================
+
+STEP 13
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0445
+
+================================================================================
+
+STEP 14
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 15
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 16
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0382
+
+================================================================================
+
+STEP 17
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 18
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0358
+
+================================================================================
+
+STEP 19
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 20
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 21
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 22
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0384
+
+================================================================================
+
+STEP 23
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 24
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0358
+
+================================================================================
+
+STEP 25
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 26
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 27
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 28
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0385
+
+================================================================================
+
+STEP 29
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 30
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0461
+
+================================================================================
+
+STEP 31
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 32
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0461
+
+================================================================================
+
+STEP 33
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 34
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0461
+
+================================================================================
+
+STEP 35
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 36
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0359
+
+================================================================================
+
+STEP 37
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 38
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0385
+
+================================================================================
+
+STEP 39
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 40
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0359
+
+================================================================================
+
+STEP 41
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 42
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0384
+
+================================================================================
+
+STEP 43
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 44
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0359
+
+================================================================================
+
+STEP 45
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 46
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 47
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 48
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 49
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 50
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 51
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 52
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0385
+
+================================================================================
+
+STEP 53
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 54
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0358
+
+================================================================================
+
+STEP 55
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 56
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 57
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 58
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0334
+
+================================================================================
+
+STEP 59
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0438
+
+================================================================================
+
+STEP 60
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0461
+
+================================================================================
+
+STEP 61
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 62
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0359
+
+================================================================================
+
+STEP 63
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 64
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0385
+
+================================================================================
+
+STEP 65
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 66
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0359
+
+================================================================================
+
+STEP 67
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 68
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0334
+
+================================================================================
+
+STEP 69
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0438
+
+================================================================================
+
+STEP 70
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0358
+
+================================================================================
+
+STEP 71
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 72
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: west
+All raw answers: ['east', 'west']
+Parsed action: west
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 1
+Step error (m): 0.0385
+
+================================================================================
+
+STEP 73
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . < . # G X
+X X X X X X X X X
+
+Raw answer: east
+All raw answers: ['east']
+Parsed action: east
+Optimal actions: ['north', 'east']
+Legal actions: ['north', 'east', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 0
+Step error (m): 0.0439
+
+================================================================================
+
+STEP 74
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . > # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0359
+
+================================================================================
+
+STEP 75
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 76
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 77
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 78
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+
+STEP 79
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . ^ . . X
+X . . . . . # G X
+X X X X X X X X X
+
+Raw answer: south
+All raw answers: ['south']
+Parsed action: south
+Optimal actions: ['east']
+Legal actions: ['north', 'east', 'south', 'west']
+Correct: False
+Error type: directional_or_detour_error
+Shield reprompts: 0
+Step error (m): 0.0446
+
+================================================================================
+
+STEP 80
+--------------------------------------------------------------------------------
+X X X X X X X X X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . # . X
+X . . . . . . . X
+X . . . . v # G X
+X X X X X X X X X
+
+Raw answer: north
+All raw answers: ['east', 'north']
+Parsed action: north
+Optimal actions: ['north']
+Legal actions: ['north', 'west']
+Correct: True
+Error type: correct
+Shield reprompts: 1
+Step error (m): 0.0437
+
+================================================================================
+

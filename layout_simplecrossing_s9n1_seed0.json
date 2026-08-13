@@ -1,0 +1,45 @@
+{
+  "source": "MiniGrid-SimpleCrossingS9N1-v0, seed 0, via MiniGridCardinalWrapper.get_state()",
+  "env_name": "MiniGrid-SimpleCrossingS9N1-v0",
+  "seed": 0,
+  "grid_size": [
+    9,
+    9
+  ],
+  "start_cell": [
+    1,
+    1
+  ],
+  "start_facing": "east",
+  "goal_cell": [
+    7,
+    7
+  ],
+  "obstacle_cells": [
+    [
+      2,
+      2
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      2,
+      6
+    ],
+    [
+      2,
+      7
+    ]
+  ],
+  "optimal_path_length": 12
+}

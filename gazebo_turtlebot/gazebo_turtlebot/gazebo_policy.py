@@ -69,36 +69,33 @@ def get_legal_cardinal_actions(env):
     )
 
 
+CARDINAL_ORDER = [
+    "north",
+    "east",
+    "south",
+    "west",
+]
+
+
 def legal_action_names(env, mode):
-    """
-    Return the legal actions using the action vocabulary shown to the model.
-    """
     legal_cardinal = (
         get_legal_cardinal_actions(env)
     )
 
+    ordered = [
+        name
+        for name in CARDINAL_ORDER
+        if name in legal_cardinal
+    ]
+
     if mode == "allocentric":
-        return sorted(
-            legal_cardinal
-        )
+        return ordered
 
     if mode == "egocentric":
-        names = []
-
-        for cardinal_action in sorted(
-            legal_cardinal
-        ):
-            relative_name = (
-                env.cardinal_to_relative_name(
-                    cardinal_action
-                )
-            )
-
-            names.append(
-                relative_name
-            )
-
-        return names
+        return [
+            env.cardinal_to_relative_name(name)
+            for name in ordered
+        ]
 
     raise ValueError(
         f"Unknown mode: {mode}"
