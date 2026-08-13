@@ -13,18 +13,17 @@ class GazeboGridWorld:
     """
     Discrete grid abstraction over a continuous Gazebo/TurtleBot world.
 
-    The grid uses the same row/column convention as the MiniGrid experiments:
+    Grid convention:
+        - row increases southward
+        - column increases eastward
 
-        row increases southward
-        column increases eastward
-
-    Gazebo uses:
-        +x = east
-        +y = north
+    Gazebo convention:
+        - +x = east
+        - +y = north
 
     Therefore:
-        col -> +x
-        row -> -y
+        - increasing column -> increasing x
+        - increasing row -> decreasing y
     """
 
     def __init__(
@@ -48,7 +47,10 @@ class GazeboGridWorld:
         self.goal_cell = tuple(goal_cell)
 
         self.obstacle_cells = set(
-            obstacle_cells or []
+            tuple(cell)
+            for cell in (
+                obstacle_cells or []
+            )
         )
 
         self.origin_x = None
@@ -60,19 +62,22 @@ class GazeboGridWorld:
         """
         Treat the robot's current Gazebo pose as start_cell.
 
-        This avoids depending on Gazebo absolute spawn coordinates.
+        This means we do not depend on a particular absolute Gazebo
+        spawn coordinate. Whatever pose the robot currently has becomes
+        the world-space location corresponding to start_cell.
         """
-
         state = self.adapter.get_state()
 
         self.origin_x = (
             state["x"]
-            - self.start_cell[1] * self.cell_size
+            - self.start_cell[1]
+            * self.cell_size
         )
 
         self.origin_y = (
             state["y"]
-            + self.start_cell[0] * self.cell_size
+            + self.start_cell[0]
+            * self.cell_size
         )
 
         self.facing = self.yaw_to_facing(
@@ -80,13 +85,24 @@ class GazeboGridWorld:
         )
 
     def require_initialised(self):
-        if self.origin_x is None or self.origin_y is None:
+        if (
+            self.origin_x is None
+            or self.origin_y is None
+        ):
             raise RuntimeError(
                 "GazeboGridWorld is not initialised. "
                 "Call initialise_from_current_pose() first."
             )
 
-    def grid_to_world(self, row, col):
+    def grid_to_world(
+        self,
+        row,
+        col,
+    ):
+        """
+        Convert a discrete grid cell into the corresponding Gazebo
+        world-space coordinate.
+        """
         self.require_initialised()
 
         x = (
@@ -101,7 +117,15 @@ class GazeboGridWorld:
 
         return x, y
 
-    def world_to_grid(self, x, y):
+    def world_to_grid(
+        self,
+        x,
+        y,
+    ):
+        """
+        Convert a continuous Gazebo pose into the nearest discrete
+        grid cell.
+        """
         self.require_initialised()
 
         col = round(
@@ -114,23 +138,54 @@ class GazeboGridWorld:
             / self.cell_size
         )
 
-        return int(row), int(col)
+        return (
+            int(row),
+            int(col),
+        )
 
-    def yaw_to_facing(self, yaw):
+    @staticmethod
+    def normalize_angle(angle):
+        while angle > math.pi:
+            angle -= (
+                2.0 * math.pi
+            )
+
+        while angle < -math.pi:
+            angle += (
+                2.0 * math.pi
+            )
+
+        return angle
+
+    def yaw_to_facing(
+        self,
+        yaw,
+    ):
+        """
+        Convert a continuous yaw angle into the nearest cardinal
+        facing direction.
+        """
         if yaw is None:
             return self.facing
 
         headings = {
             "east": 0.0,
-            "north": math.pi / 2.0,
+            "north": (
+                math.pi / 2.0
+            ),
             "west": math.pi,
-            "south": -math.pi / 2.0,
+            "south": (
+                -math.pi / 2.0
+            ),
         }
 
         best_name = None
         best_error = None
 
-        for name, target in headings.items():
+        for (
+            name,
+            target,
+        ) in headings.items():
             error = abs(
                 self.normalize_angle(
                     yaw - target
@@ -146,18 +201,13 @@ class GazeboGridWorld:
 
         return best_name
 
-    @staticmethod
-    def normalize_angle(angle):
-        while angle > math.pi:
-            angle -= 2.0 * math.pi
-
-        while angle < -math.pi:
-            angle += 2.0 * math.pi
-
-        return angle
-
     def get_agent_cell(self):
-        state = self.adapter.get_state()
+        """
+        Return the robot's current discrete grid cell.
+        """
+        state = (
+            self.adapter.get_state()
+        )
 
         return self.world_to_grid(
             state["x"],
@@ -165,15 +215,24 @@ class GazeboGridWorld:
         )
 
     def get_state(self):
-        pose = self.adapter.get_state()
-
-        agent_cell = self.world_to_grid(
-            pose["x"],
-            pose["y"],
+        """
+        Return the current experiment state.
+        """
+        pose = (
+            self.adapter.get_state()
         )
 
-        facing = self.yaw_to_facing(
-            pose["yaw"]
+        agent_cell = (
+            self.world_to_grid(
+                pose["x"],
+                pose["y"],
+            )
+        )
+
+        facing = (
+            self.yaw_to_facing(
+                pose["yaw"]
+            )
         )
 
         self.facing = facing
@@ -185,73 +244,260 @@ class GazeboGridWorld:
             "pose": pose,
         }
 
-    def is_inside_grid(self, row, col):
+    def is_inside_grid(
+        self,
+        row,
+        col,
+    ):
         return (
             0 <= row < self.rows
             and 0 <= col < self.cols
         )
 
-    def is_obstacle(self, row, col):
+    def is_obstacle(
+        self,
+        row,
+        col,
+    ):
         return (
             row,
             col,
         ) in self.obstacle_cells
 
-    def is_blocked(self, row, col):
+    def is_blocked(
+        self,
+        row,
+        col,
+    ):
+        """
+        Return:
+
+            (True, "boundary")
+            (True, "obstacle")
+            (False, None)
+        """
         if not self.is_inside_grid(
             row,
             col,
         ):
-            return True, "boundary"
+            return (
+                True,
+                "boundary",
+            )
 
         if self.is_obstacle(
             row,
             col,
         ):
-            return True, "obstacle"
+            return (
+                True,
+                "obstacle",
+            )
 
-        return False, None
+        return (
+            False,
+            None,
+        )
 
     def get_legal_actions(self):
-        row, col = self.get_agent_cell()
+        """
+        Return currently legal cardinal actions as strings.
+
+        Example:
+            ["north", "east", "west"]
+        """
+        row, col = (
+            self.get_agent_cell()
+        )
 
         legal = []
 
-        for action, (
-            delta_row,
-            delta_col,
+        for (
+            action,
+            (
+                delta_row,
+                delta_col,
+            ),
         ) in CARDINAL_ACTIONS.items():
-            next_row = row + delta_row
-            next_col = col + delta_col
+            next_row = (
+                row + delta_row
+            )
 
-            blocked, _ = self.is_blocked(
-                next_row,
-                next_col,
+            next_col = (
+                col + delta_col
+            )
+
+            blocked, _ = (
+                self.is_blocked(
+                    next_row,
+                    next_col,
+                )
             )
 
             if not blocked:
-                legal.append(action)
+                legal.append(
+                    action
+                )
 
         return legal
 
-    def execute_action(self, action):
-        action = action.lower().strip()
+    def relative_to_cardinal(
+        self,
+        relative_action,
+    ):
+        """
+        Convert an egocentric relative action to a cardinal action.
 
-        if action not in CARDINAL_ACTIONS:
-            raise ValueError(
-                f"Unknown action '{action}'."
+        Relative action encoding:
+            0 = forward
+            1 = right
+            2 = backward
+            3 = left
+
+        Example:
+            facing north + right -> east
+            facing east + right  -> south
+        """
+        facing_order = [
+            "north",
+            "east",
+            "south",
+            "west",
+        ]
+
+        state = self.get_state()
+
+        facing = state["facing"]
+
+        facing_index = (
+            facing_order.index(
+                facing
             )
-
-        row, col = self.get_agent_cell()
-
-        delta_row, delta_col = (
-            CARDINAL_ACTIONS[action]
         )
 
-        next_row = row + delta_row
-        next_col = col + delta_col
+        cardinal_index = (
+            facing_index
+            + int(
+                relative_action
+            )
+        ) % 4
 
-        blocked, blocked_type = self.is_blocked(
+        return facing_order[
+            cardinal_index
+        ]
+
+    def cardinal_to_relative_name(
+        self,
+        cardinal_action,
+    ):
+        """
+        Convert a cardinal action into the corresponding egocentric
+        action name from the robot's current facing direction.
+
+        Returns one of:
+            forward
+            right
+            backward
+            left
+        """
+        facing_order = [
+            "north",
+            "east",
+            "south",
+            "west",
+        ]
+
+        relative_names = [
+            "forward",
+            "right",
+            "backward",
+            "left",
+        ]
+
+        state = self.get_state()
+
+        facing = state["facing"]
+
+        facing_index = (
+            facing_order.index(
+                facing
+            )
+        )
+
+        action_index = (
+            facing_order.index(
+                cardinal_action
+            )
+        )
+
+        relative_index = (
+            action_index
+            - facing_index
+        ) % 4
+
+        return relative_names[
+            relative_index
+        ]
+
+    def get_relative_legal_actions(self):
+        """
+        Return legal actions using the current egocentric vocabulary.
+        """
+        return [
+            self.cardinal_to_relative_name(
+                action
+            )
+            for action
+            in self.get_legal_actions()
+        ]
+
+    def execute_action(
+        self,
+        action,
+    ):
+        """
+        Execute one cardinal action if it is legal.
+
+        Illegal actions are rejected before the TurtleBot moves.
+        """
+        action = (
+            action.lower().strip()
+        )
+
+        if (
+            action
+            not in CARDINAL_ACTIONS
+        ):
+            raise ValueError(
+                f"Unknown action "
+                f"'{action}'. "
+                "Expected north, east, "
+                "south, or west."
+            )
+
+        row, col = (
+            self.get_agent_cell()
+        )
+
+        (
+            delta_row,
+            delta_col,
+        ) = CARDINAL_ACTIONS[
+            action
+        ]
+
+        next_row = (
+            row + delta_row
+        )
+
+        next_col = (
+            col + delta_col
+        )
+
+        (
+            blocked,
+            blocked_type,
+        ) = self.is_blocked(
             next_row,
             next_col,
         )
@@ -260,21 +506,35 @@ class GazeboGridWorld:
             return {
                 "executed": False,
                 "blocked": True,
-                "blocked_type": blocked_type,
+                "blocked_type": (
+                    blocked_type
+                ),
                 "action": action,
-                "from_cell": (row, col),
-                "to_cell": (next_row, next_col),
+                "from_cell": (
+                    row,
+                    col,
+                ),
+                "to_cell": (
+                    next_row,
+                    next_col,
+                ),
             }
 
-        before_pose = self.adapter.get_state()
-
-        after_pose = self.adapter.execute(
-            action
+        before_pose = (
+            self.adapter.get_state()
         )
 
-        final_cell = self.world_to_grid(
-            after_pose["x"],
-            after_pose["y"],
+        after_pose = (
+            self.adapter.execute(
+                action
+            )
+        )
+
+        final_cell = (
+            self.world_to_grid(
+                after_pose["x"],
+                after_pose["y"],
+            )
         )
 
         self.facing = action
@@ -284,14 +544,23 @@ class GazeboGridWorld:
             "blocked": False,
             "blocked_type": None,
             "action": action,
-            "from_cell": (row, col),
+            "from_cell": (
+                row,
+                col,
+            ),
             "intended_cell": (
                 next_row,
                 next_col,
             ),
-            "final_cell": final_cell,
-            "before_pose": before_pose,
-            "after_pose": after_pose,
+            "final_cell": (
+                final_cell
+            ),
+            "before_pose": (
+                before_pose
+            ),
+            "after_pose": (
+                after_pose
+            ),
         }
 
     def reached_goal(self):
@@ -300,8 +569,15 @@ class GazeboGridWorld:
             == self.goal_cell
         )
 
-    def make_allocentric_description(self):
-        state = self.get_state()
+    def make_allocentric_description(
+        self,
+    ):
+        """
+        Allocentric prompt matching the existing grid-navigation format.
+        """
+        state = (
+            self.get_state()
+        )
 
         return f"""You are navigating a grid world.
 
@@ -326,8 +602,15 @@ Answer with one word only:
 north, east, south, or west
 """
 
-    def make_egocentric_description(self):
-        state = self.get_state()
+    def make_egocentric_description(
+        self,
+    ):
+        """
+        Egocentric prompt matching the existing relative-action format.
+        """
+        state = (
+            self.get_state()
+        )
 
         return f"""You are navigating a grid world.
 
