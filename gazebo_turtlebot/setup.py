@@ -28,6 +28,9 @@ setup(
         "console_scripts": [
             "waypoint_driver = gazebo_turtlebot.waypoint_driver:main",
             "grid_action = gazebo_turtlebot.grid_action_controller:main",
+		    "test_adapter = gazebo_turtlebot.test_adapter:main",
+            "test_grid_world = gazebo_turtlebot.test_grid_world:main",
+            "test_obstacle_legality = gazebo_turtlebot.test_obstacle_legality:main",
         ],
     },
 )
