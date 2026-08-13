@@ -4,9 +4,9 @@ from pathlib import Path
 
 from llm_policy import make_openai_policy_fn
 
-from gazebo_turtlebot.gazebo_adapter import GazeboAdapter
-from gazebo_turtlebot.gazebo_grid_world import GazeboGridWorld
-from gazebo_turtlebot.gazebo_policy import (
+from gazebo_turtlebot.gazebo_turtlebot.gazebo_adapter import GazeboAdapter
+from gazebo_turtlebot.gazebo_turtlebot.gazebo_grid_world import GazeboGridWorld
+from gazebo_turtlebot.gazebo_turtlebot.gazebo_policy import (
     choose_action,
     get_prompt,
 )
